@@ -16,10 +16,10 @@ import numpy as np
 from collections import deque
 import time
 import cvxpy as cp
-from skopt import gp_minimize
-from skopt.space import Integer
-from skopt.utils import use_named_args
-from skopt.callbacks import VerboseCallback
+# from skopt import gp_minimize
+# from skopt.space import Integer
+# from skopt.utils import use_named_args
+# from skopt.callbacks import VerboseCallback
 
 # 将各种硬件参数以及权重矩阵作为统一成基因
 # simba
@@ -2912,7 +2912,6 @@ class MappingExplorer:
         # try:
         mapping_list, _, arch = self.generate_mapping_for_all_DNN(self.tensor_dimensions_list, p)
         
-        
         values_list = []
         utils.store_yaml(f'{temp_dir}/temp_arch.yaml', arch)
         for i in range(len(mapping_list)):
@@ -5584,7 +5583,7 @@ class MappingExplorer:
         print(f"最优损失：{best_loss:.2f} | 最优参数：{best_params}")
         
         return best_params, best_loss, all_results
-
+    '''
     def run_BO(self, n_samples=10, random_seed=42, n_initial_points=5):
         """
         贝叶斯优化版本的参数搜索（使用skopt库）- 修复Integer空间边界问题
@@ -5761,3 +5760,4 @@ class MappingExplorer:
         print("="*50)
         
         return best_params, best_loss, all_results
+    '''
