@@ -3,9 +3,11 @@ import pathlib
 from datetime import datetime
 import time
 from algorithms.simple_mobo.mobo import MOBO
+import numpy as np
+from typing import Dict, List, Tuple
 
-class HardwareFisrt:
-    def __int__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False):
+class HardwareFirstSearch:
+    def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False):
         self.accl_name = accelerator
 
         if optim_obj == 'latency':
@@ -55,10 +57,10 @@ class HardwareFisrt:
         self.buffers_with_spmap = set([key for key, value in self.buffer_spmap_cstr.items() if value > 1])
         self.num_buffer_level = num_buffer_levels
 
-        self.buf_energy_cost = self.get_default_buffer_energy_cost()
+       
 
         self.dimension, self.dimension_dict = self.problem.get_problem_info()
-        self.expanded_dimension_dict = self.get_expanded_problem()
+
 
        
         # 用于存储temporal层级
@@ -101,12 +103,35 @@ class HardwareFisrt:
         self.buffer_temporal_list = None
         self.buffer_spatial_list = None
 
-def run(operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False):
-    HF = HardwareFisrt(operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False)
-    bo = MOBO(nobjs=3, ninit=10, lb=ds.lb, ub=ds.ub, dims=ds.dims, func=ds, neval=60, 
-        seed=35)
-    begin = time.time()
-    bo.start()
-    end = time.time()
-    print(f"MOBO takes {end - begin} seconds")
-    # HF.dump_pareto(bo.curt_pareto_samples, output_dir)
+        self.dim2slice = {} # slice is the min, max, slice_num, default dictionary
+        self.dims = None
+
+
+    def get_space_list(self, dim_id: int) -> List[int]:
+        slice_dict = self.dim2slice[dim_id] # dict
+        step = (slice_dict["max"] - slice_dict["min"]) / slice_dict["slice_num"]
+        ret_list = [int(slice_dict["min"] + step * (i + 1)) for i in range(slice_dict["slice_num"])]
+        return ret_list
+
+    def get_ub(self) -> np.ndarray:
+        ub = np.zeros(self.dims)
+        for dim_id in range(self.dims):
+            ub[dim_id] = len(self.get_space_list(dim_id))
+        return ub
+
+    def __call__(self, *args, **kwds):
+        pass
+
+    def run(self):
+        lb = np.zeros(self.dims)
+        ub = self.get_ub()
+        bo = MOBO(nobjs=3, ninit=10, lb=lb, ub=self.ub, dims=self.dims, func=self, neval=60, 
+            seed=35)
+        # begin = time.time()
+        # bo.start()
+        # end = time.time()
+        # print(f"MOBO takes {end - begin} seconds")
+        # HF.dump_pareto(bo.curt_pareto_samples, output_dir)
+
+if __name__ == "__main__":
+    pass

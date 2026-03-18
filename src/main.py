@@ -6,6 +6,8 @@ import pickle
 from explorer2 import MappingExplorer
 from datetime import datetime
 import json
+from hardware_first import HardwareFirstSearch
+from mapping_first import MappingFirstSearch
 
 def main():
     # current_time = datetime.now()
@@ -29,6 +31,7 @@ def main():
     all_DNN                    = opt.all_DNN
     weight_num                 = opt.weight_num
     all_workload               = opt.all_workload
+    search_mode                = opt.search_mode
     
     if all_DNN:
         if all_workload:
@@ -214,9 +217,18 @@ def main():
                     problem['problem']['instance']['Hdilation'] = layer_problem['problem']['Hdilation']
 
                     problems_list.append(problem)
-        ME = MappingExplorer(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, weight_num, solver=solver, all_DNN=all_DNN)
-        print(opt.population)
-        chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
+        if search_mode == "UF":
+            ME = MappingExplorer(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, weight_num, solver=solver, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
+        elif search_mode == "HF":
+            HF = HardwareFirstSearch(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = HF.run()
+        elif search_mode == "MF":
+            MF = MappingFirstSearch(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = MF.run(num_population=opt.population, num_generations=opt.epochs)
     else:
         with open(os.path.join(benchmark_dir, '{}_workload/layers.yaml'.format(workload)), 'r') as fd:
             layers = yaml.load(fd, Loader=yaml.SafeLoader)
@@ -328,4 +340,5 @@ if __name__ == '__main__':
     parser.add_argument('--all_DNN', action='store_true', help='启用 all_DNN 模式（无需额外参数）')
     parser.add_argument('--weight_num', type=int)
     parser.add_argument('--all_workload', action='store_true', help='启用 all_DNN 模式（无需额外参数）')
+    parser.add_argument('--search_mode', type=str, default='UF', help='搜索策略：硬件优先（HF），映射优先（MF），以及默认统一搜索（UF）')
     main()
