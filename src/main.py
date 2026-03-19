@@ -338,7 +338,7 @@ if __name__ == '__main__':
     parser.add_argument('--weight_matrix_config', type=str, default=None)
     parser.add_argument('--solver', type=str, default='lp')
     parser.add_argument('--all_DNN', action='store_true', help='启用 all_DNN 模式（无需额外参数）')
-    parser.add_argument('--weight_num', type=int)
+    parser.add_argument('--weight_num', type=int, default=10)
     parser.add_argument('--all_workload', action='store_true', help='启用 all_DNN 模式（无需额外参数）')
     parser.add_argument('--search_mode', type=str, default='UF', help='搜索策略：硬件优先（HF），映射优先（MF），以及默认统一搜索（UF）')
     main()

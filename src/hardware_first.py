@@ -5,6 +5,10 @@ import time
 from algorithms.simple_mobo.mobo import MOBO
 import numpy as np
 from typing import Dict, List, Tuple
+import os
+import yaml
+import shutil
+import uuid
 
 class HardwareFirstSearch:
     def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False):
@@ -103,15 +107,61 @@ class HardwareFirstSearch:
         self.buffer_temporal_list = None
         self.buffer_spatial_list = None
 
-        self.dim2slice = {} # slice is the min, max, slice_num, default dictionary
-        self.dims = None
+        self.init()
+        self.original_dir = os.getcwd()
+        self.temp_dir = f'{self.original_dir}/HF_tmp/temp_{uuid.uuid4()}'
+        self.clean_temp = True
 
+    def __del__(self):
+        """类实例销毁时自动清理临时目录（析构函数）"""
+        if self.clean_temp and os.path.exists(self.temp_dir):
+            try:
+                shutil.rmtree(self.temp_dir)
+                print(f"✅ 自动清理临时目录：{self.temp_dir}")
+            except Exception as e:
+                print(f"⚠️ 清理临时目录失败：{e}")
+
+    def init(self):
+        # --------------------------
+        # 统一使用新格式的维度定义
+        # --------------------------
+        self.optim_dims = {
+            0: {"name": "GlobalBuffer", "attr": "entries", "min": 512, "max": 3584, "slice_num": 24, "default": 2048},
+            1: {"name": "InputBuffer", "attr": "entries", "min": 128, "max": 1920, "slice_num": 28, "default": 1024},
+            2: {"name": "WeightBuffer", "attr": "entries", "min": 32,  "max": 992,  "slice_num": 30, "default": 512},
+            3: {"name": "AccumulationBuffer", "attr": "entries", "min": 32,  "max": 224,  "slice_num": 12, "default": 128},
+            4: {"name": "Registers", "attr": "instances", "min": 512, "max": 2048, "slice_num": 12, "default": 1024}
+        }
+        
+        # --------------------------
+        # 同步/固定规则（适配新命名）
+        # --------------------------
+        self.syn_instances = {"LMAC": "Registers"}  # 原PEWeightRegs→Registers
+        self.keep_instances = {
+            "GlobalBuffer": 1,
+            "InputBuffer": 16,
+            "WeightBuffer": 128,
+            "AccumulationBuffer": 128
+        }
+        
+        # --------------------------
+        # 可优化维度总数
+        # --------------------------
+        self.dims = len(self.optim_dims)
 
     def get_space_list(self, dim_id: int) -> List[int]:
-        slice_dict = self.dim2slice[dim_id] # dict
-        step = (slice_dict["max"] - slice_dict["min"]) / slice_dict["slice_num"]
-        ret_list = [int(slice_dict["min"] + step * (i + 1)) for i in range(slice_dict["slice_num"])]
-        return ret_list
+        if dim_id not in self.optim_dims:
+            raise ValueError(f"维度ID {dim_id} 未在optim_dims中定义")
+        
+        dim = self.optim_dims[dim_id]
+        min_val = dim["min"]
+        max_val = dim["max"]
+        slice_num = dim["slice_num"]
+        step = (max_val - min_val) / slice_num
+        
+        # 生成离散的可选值列表
+        space_list = [int(min_val + step * (i + 1)) for i in range(slice_num)]
+        return space_list
 
     def get_ub(self) -> np.ndarray:
         ub = np.zeros(self.dims)
@@ -119,18 +169,234 @@ class HardwareFirstSearch:
             ub[dim_id] = len(self.get_space_list(dim_id))
         return ub
 
-    def __call__(self, *args, **kwds):
-        pass
+    def gen_depth_updates(self, candidate: List[int]) -> Dict[str, int]:
+        updates = {}
+        for dim_id in range(len(candidate)):
+            names = self.dim2names[dim_id]
+            if "depth" in names:
+                level_name = names[0]
+                space_list = self.get_space_list(dim_id)
+                level_depth = space_list[candidate[dim_id]]
+                updates[level_name] = level_depth
+        
+        for key, value in self.syn_depth.items():
+            updates[key] = updates[value]
+        for key, value in self.keep_depth.items():
+            updates[key] = value
+        
+        return updates
+
+    # def calc_area(self, cand: List[int]) -> float:
+    #     # get updates
+    #     depth_updates = self.gen_depth_updates(cand)
+    #     inst_updates = self.gen_instances_updates(cand)
+    #     # call accelergy handler
+    #     self.accelergy_handler.update_accelergy(depth_updates, inst_updates)
+    #     ert, art = self.accelergy_handler.get_ert_art()
+    #     # calculate area
+    #     area = self.gen_area_from_art(art, inst_updates)
+    #     return area
+
+    def gen_instances_updates(self, candidate: List[int]) -> Dict[str, int]:
+        updates = {}
+        for key, value in self.keep_instances.items():
+            updates[key] = value
+        for dim_id in range(len(candidate)):
+            names = self.dim2names[dim_id]
+            if "instances" in names:
+                name = names[0]
+                space_list = self.get_space_list(dim_id)
+                instances_num = space_list[candidate[dim_id]]
+                updates[name] = instances_num
+        
+        for key, value in self.syn_instances.items():
+            updates[key] = updates[value]
+        return updates
+
+    def _get_value_by_idx(self, dim_id: int, idx: int) -> int:
+        """
+        根据维度ID和索引，计算对应的实际参数值（方案B适配版）
+        :param dim_id: 维度ID（对应optim_dims的key）
+        :param idx: 维度内的索引（0 ~ slice_num-1）
+        :return: 实际参数值（如entries/instances的具体数值）
+        """
+        # 校验维度ID合法性
+        if dim_id not in self.optim_dims:
+            raise ValueError(f"无效的维度ID：{dim_id}，仅支持{list(self.optim_dims.keys())}")
+        
+        # 从optim_dims中读取维度配置
+        dim_config = self.optim_dims[dim_id]
+        min_val = dim_config["min"]
+        max_val = dim_config["max"]
+        slice_num = dim_config["slice_num"]
+        
+        # 校验索引合法性
+        if idx < 0 or idx >= slice_num:
+            raise ValueError(f"维度{dim_id}的索引{idx}越界，范围：0 ~ {slice_num-1}")
+        
+        # 计算步长并生成实际值
+        step = (max_val - min_val) / slice_num
+        target_value = int(min_val + step * (idx + 1))
+        return target_value
+
+    def __call__(self, x: np.ndarray) -> List[float]:
+        energy: float = 2**63
+        cycles: float = 2**63
+        area: float = 2**63
+        cand = list(x.astype(int))
+
+        # ========== 2. 硬编码基础架构模板（核心：替代原Accelergy加载的架构） ==========
+        new_arch = {
+            "arch": {
+                "arithmetic": {
+                    "instances": 1024,  # 默认值，会被候选参数更新
+                    "word-bits": 8
+                },
+                "storage": [
+                    {
+                        "cluster-size": 64,
+                        "entries": 1,
+                        "instances": 1024,  # 默认值
+                        "name": "Registers",
+                        "num-banks": 8,
+                        "num-ports": 2,
+                        "word-bits": 8
+                    },
+                    {
+                        "cluster-size": 1,
+                        "entries": 3072,  # 默认值
+                        "instances": 16,
+                        "name": "AccumulationBuffer",
+                        "network-word-bits": 16,
+                        "num-banks": 2,
+                        "num-ports": 2,
+                        "word-bits": 24
+                    },
+                    {
+                        "block-size": 4,
+                        "entries": 32768,  # 默认值
+                        "instances": 16,
+                        "name": "WeightBuffer",
+                        "num-banks": 8,
+                        "num-ports": 1,
+                        "word-bits": 8
+                    },
+                    {
+                        "block-size": 4,
+                        "entries": 8192,  # 默认值
+                        "instances": 16,
+                        "name": "InputBuffer",
+                        "num-banks": 1,
+                        "num-ports": 2,
+                        "word-bits": 8
+                    },
+                    {
+                        "block-size": 8,
+                        "entries": 65536,  # 默认值
+                        "instances": 1,
+                        "name": "GlobalBuffer",
+                        "num-banks": 256,
+                        "num-ports": 2,
+                        "word-bits": 8
+                    },
+                    {
+                        "bandwidth": 1,
+                        "block-size": 64,
+                        "instances": 1,
+                        "name": "DRAM",
+                        "technology": "DRAM",
+                        "word-bits": 8
+                    }
+                ]
+            }
+        }
+        
+        
+        # cand_area = self.calc_area(cand) # update accelergy in the mean time
+        # if(cand_area > self.default_area):
+        #     return [energy, cycles, area]
+        
+        # generate tmp arch file
+        # ========== 3. 根据候选参数更新架构（核心逻辑） ==========
+        for dim_id, idx in enumerate(cand):
+            try:
+                # 调用修复后的_get_value_by_idx方法获取实际值
+                target_value = self._get_value_by_idx(dim_id, idx)
+                # 获取维度对应的组件名和属性名
+                dim_config = self.optim_dims[dim_id]
+                comp_name = dim_config["name"]
+                attr_name = dim_config["attr"]
+
+                # 更新架构字典
+                if comp_name == "arithmetic":
+                    new_arch["arch"]["arithmetic"][attr_name] = target_value
+                else:
+                    for storage_comp in new_arch["arch"]["storage"]:
+                        if storage_comp["name"] == comp_name:
+                            storage_comp[attr_name] = target_value
+                            break
+
+            except ValueError as e:
+                print(f"❌ 维度{dim_id}参数更新失败：{e}")
+                return [energy, cycles, area]
+        
+        # ========== 4. 生成临时架构文件 ==========
+        try:
+            os.makedirs(self.temp_dir, exist_ok=True)
+            temp_arch_path = os.path.join(self.temp_dir, "simba.yaml")
+            with open(temp_arch_path, "w", encoding='utf-8') as f:
+                yaml.dump(
+                    new_arch,
+                    f,
+                    default_flow_style=False,  # 块状格式，非行内
+                    sort_keys=False,           # 保留键顺序
+                    indent=2                   # 缩进2个空格
+                )
+        except Exception as e:
+            print(f"❌ 生成架构文件失败：{e}")
+            return [energy, cycles, area]
+        
+        print("⚠️ 评估逻辑未实现，返回临时值")
+        return [100.0, 10000.0, 0.1]  # 临时能耗、延迟、面积
+        # run lemon
+        arch_mapspace_files = f"{self.arch_tmp_dir}/*.yaml" + f" {self.arch_tmp_dir}/components/*.yaml"
+        lookup_path = os.path.dirname(self.workload_dir) + "/lookups.yaml"
+        network = self.workload_dir.split('/')[-1]
+        if os.path.exists(self.tmp_output_dir):
+            shutil.rmtree(self.tmp_output_dir)
+        os.mkdir(self.tmp_output_dir)
+        with open(lookup_path, "r") as f:
+            lookup_yaml = yaml.safe_load(f)
+        lookup_list = lookup_yaml['layer_workload_lookups'][network]
+        lookup_str = " ".join(map(str, lookup_list))
+        cmd = f"lemon {arch_mapspace_files} {self.workload_dir} -lu {lookup_str} -o {self.tmp_output_dir}"
+        try:
+            begin = time.time()
+            result = subprocess.run(cmd.split(), capture_output=True, timeout=1500)
+            end = time.time()
+            print(f"lemon takes {end - begin} seconds", flush=True)
+        except subprocess.TimeoutExpired:
+            print("timeout after 1500 seconds", flush=True)
+        success = utils.check_suffix_file(self.tmp_output_dir, ".stats.txt")
+        if not success: # lemon fails or timeout
+            return [energy, cycles, area]
+            # print(result.stdout.decode("utf-8"))
+            # print(result.stderr.decode("utf-8"))
+            # exit(1)
+        # get energy, cycles and area
+        lemon_handler = LemonHandler()
+        energy, cycles, edp, area = lemon_handler.get_network_data(self.tmp_output_dir, lookup_path)
+        return [round(energy, 2), round(cycles, 2), area]
 
     def run(self):
         lb = np.zeros(self.dims)
         ub = self.get_ub()
-        bo = MOBO(nobjs=3, ninit=10, lb=lb, ub=self.ub, dims=self.dims, func=self, neval=60, 
+        bo = MOBO(nobjs=3, ninit=10, lb=lb, ub=ub, dims=self.dims, func=self, neval=60, 
             seed=35)
-        # begin = time.time()
-        # bo.start()
-        # end = time.time()
-        # print(f"MOBO takes {end - begin} seconds")
+        begin = time.time()
+        bo.start()
+        end = time.time()
+        print(f"MOBO takes {end - begin} seconds")
         # HF.dump_pareto(bo.curt_pareto_samples, output_dir)
 
 if __name__ == "__main__":

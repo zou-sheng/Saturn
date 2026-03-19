@@ -1047,7 +1047,7 @@ class MappingExplorer:
 
             # 正方形阵列
             # prob += spatial_capacity[2] == spatial_capacity[1]
-            prob += spatial_capacity[2] == 6 #math.log2(112)
+            # prob += spatial_capacity[2] == 6 #math.log2(112)
         
         elif self.accl_name == 'NEW':
             # buffer_capacity限制
