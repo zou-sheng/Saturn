@@ -9,6 +9,7 @@ import os
 import yaml
 import shutil
 import uuid
+from HF_explorer import MappingExplorer
 
 class HardwareFirstSearch:
     def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False):
@@ -244,7 +245,8 @@ class HardwareFirstSearch:
         cycles: float = 2**63
         area: float = 2**63
         cand = list(x.astype(int))
-
+        #先不处理area
+        area = 0       
         # ========== 2. 硬编码基础架构模板（核心：替代原Accelergy加载的架构） ==========
         new_arch = {
             "arch": {
@@ -356,37 +358,13 @@ class HardwareFirstSearch:
             print(f"❌ 生成架构文件失败：{e}")
             return [energy, cycles, area]
         
-        print("⚠️ 评估逻辑未实现，返回临时值")
-        return [100.0, 10000.0, 0.1]  # 临时能耗、延迟、面积
-        # run lemon
-        arch_mapspace_files = f"{self.arch_tmp_dir}/*.yaml" + f" {self.arch_tmp_dir}/components/*.yaml"
-        lookup_path = os.path.dirname(self.workload_dir) + "/lookups.yaml"
-        network = self.workload_dir.split('/')[-1]
-        if os.path.exists(self.tmp_output_dir):
-            shutil.rmtree(self.tmp_output_dir)
-        os.mkdir(self.tmp_output_dir)
-        with open(lookup_path, "r") as f:
-            lookup_yaml = yaml.safe_load(f)
-        lookup_list = lookup_yaml['layer_workload_lookups'][network]
-        lookup_str = " ".join(map(str, lookup_list))
-        cmd = f"lemon {arch_mapspace_files} {self.workload_dir} -lu {lookup_str} -o {self.tmp_output_dir}"
-        try:
-            begin = time.time()
-            result = subprocess.run(cmd.split(), capture_output=True, timeout=1500)
-            end = time.time()
-            print(f"lemon takes {end - begin} seconds", flush=True)
-        except subprocess.TimeoutExpired:
-            print("timeout after 1500 seconds", flush=True)
-        success = utils.check_suffix_file(self.tmp_output_dir, ".stats.txt")
-        if not success: # lemon fails or timeout
-            return [energy, cycles, area]
-            # print(result.stdout.decode("utf-8"))
-            # print(result.stderr.decode("utf-8"))
-            # exit(1)
-        # get energy, cycles and area
-        lemon_handler = LemonHandler()
-        energy, cycles, edp, area = lemon_handler.get_network_data(self.tmp_output_dir, lookup_path)
-        return [round(energy, 2), round(cycles, 2), area]
+        
+        # run saturn4HF
+        # ME = MappingExplorer()
+        # energy, cycles, edp, area = ME.output
+        energy = 0
+        cycles = 0
+        return [energy, cycles, area]
 
     def run(self):
         lb = np.zeros(self.dims)

@@ -2871,29 +2871,92 @@ class MappingExplorer:
         mapping_list, _, arch = self.generate_mapping_and_config_for_all_DNN(self.tensor_dimensions_list, p)
         
         
+        # 初始化存储列表（记录每层原始值，而非奖励值）
         values_list = []
+        # 原始指标存储（用于计算聚合值）
+        raw_metrics = {
+            "cycles": [], "energy": [], "utilization": [], 
+            "GFLOPs": [], "EDP": []  # 保留各层EDP仅作备份
+        }
         utils.store_yaml(f'{temp_dir}/temp_arch.yaml', arch)
         for i in range(len(mapping_list)):
             mapping = Mapping(mapping_list[i])
             remainders = {}
             outermost_idx = {}
             problem = self.problems_list[i]
+            
+            # 计算remainders和outermost_idx（原有逻辑不变）
             for d in mapping.factor_dict.keys():
                 T = problem['problem']['instance'][d]
                 F = mapping.factor_dict[d]
                 remainders[d], outermost_idx[d] = utils.find_remainders2(F[::-1], T)
-            # 需要根据探索的结果修改permutation_list，type_list， target_list和bypass_list
-            temp_mapping = utils.generate_mapping(mapping.factor_dict, mapping.permutation_list, mapping.target_list, mapping.type_list, mapping.bypass_list, remainders, outermost_idx)
+            
+            # 生成临时映射并运行timeloop（原有逻辑不变）
+            temp_mapping = utils.generate_mapping(
+                mapping.factor_dict, mapping.permutation_list, 
+                mapping.target_list, mapping.type_list, 
+                mapping.bypass_list, remainders, outermost_idx
+            )
             output_stats_path = os.path.join(temp_dir, 'timeloop-model.stats.txt')
             utils.store_yaml(f'{temp_dir}/{i}_temp.yaml', temp_mapping)
             utils.store_yaml(f'{temp_dir}/{i}_temp_prob.yaml', problem)
-            utils.run_timeloop(f'{temp_dir}/temp_arch.yaml', f'{temp_dir}/{i}_temp_prob.yaml', f'{temp_dir}/{i}_temp.yaml', cwd=temp_dir)
-            # print("评估时间：", time.time()-solve_time)
+            utils.run_timeloop(
+                f'{temp_dir}/temp_arch.yaml', 
+                f'{temp_dir}/{i}_temp_prob.yaml', 
+                f'{temp_dir}/{i}_temp.yaml', 
+                cwd=temp_dir
+            )
+            
+            # 解析输出并记录原始指标（核心修改：先存原始值，再算奖励）
             self.observation = utils.parse_timeloop_output(output_stats_path)
-            values = self.judge()
-            values_list.append(values)
+            if self.observation is not None:
+                # 记录当前层的原始指标（未取负/未加工）
+                for metric in raw_metrics.keys():
+                    raw_metrics[metric].append(self.observation.get(metric, 0.0))
+                # 生成当前层的奖励值（仅用于记录，最终奖励从原始值聚合计算）
+                values = self.judge()
+                values_list.append(values)
+            else:
+                values_list.append(None)
 
-        rewards = [sum(items) for items in zip(*values_list)]
+        # -------------- 核心：按合理逻辑计算聚合指标 --------------
+        rewards = []
+        # 1. 先计算总cycles和总energy（基础指标）
+        total_cycles = sum(raw_metrics["cycles"])
+        total_energy = sum(raw_metrics["energy"])
+        # 2. 遍历fitness_obj，按指标类型计算聚合值
+        fitness_obj = self.fitness_obj
+        for term in fitness_obj:
+            if term == "cycles":
+                # 总周期：直接累加
+                rewards.append(-total_cycles)  # 负号：周期越少奖励越高
+            elif term == "energy":
+                # 总能耗：直接累加
+                rewards.append(-total_energy)  # 负号：能耗越少奖励越高
+            elif term == "EDP":
+                # 总EDP：总周期 × 总能耗
+                total_edp = total_cycles * total_energy * 0.000001
+                rewards.append(-total_edp)  # 负号：EDP越小奖励越高
+            elif term == "utilization":
+                # 利用率：有效算力加权平均（权重=各层cycles占比）
+                if total_cycles == 0:
+                    avg_util = 0.0
+                else:
+                    # 加权平均：(util1×cycles1 + util2×cycles2 + ...) / 总cycles
+                    weighted_util = sum(u * c for u, c in zip(raw_metrics["utilization"], raw_metrics["cycles"]))
+                    avg_util = weighted_util / total_cycles
+                rewards.append(avg_util)  # 正号：利用率越高奖励越高
+            elif term == "GFLOPs":
+                # GFLOPs：总算力 / 总时间（这里用总cycles近似时间）
+                if total_cycles == 0:
+                    total_gflops = 0.0
+                else:
+                    # 总算力=各层GFLOPs×各层cycles（因为GFLOPs是“每秒算力”，乘时间=总算力）
+                    total_compute = sum(g * c for g, c in zip(raw_metrics["GFLOPs"], raw_metrics["cycles"]))
+                    total_gflops = total_compute / total_cycles
+                rewards.append(total_gflops)  # 正号：算力越高奖励越高
+            else:
+                raise NameError(f'Undefined fitness type: {term}')
         # except Exception as e:
         #     print(f"发生错误: {e}")
         #     rewards = None
