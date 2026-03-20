@@ -10,6 +10,7 @@ import yaml
 import shutil
 import uuid
 from HF_explorer import MappingExplorer
+from pathlib import Path
 
 class HardwareFirstSearch:
     def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, all_DNN=False):
@@ -358,10 +359,10 @@ class HardwareFirstSearch:
             print(f"❌ 生成架构文件失败：{e}")
             return [energy, cycles, area]
         
-        
+        accelerator_dir = Path(temp_arch_path)
         # run saturn4HF
-        # ME = MappingExplorer()
-        # energy, cycles, edp, area = ME.output
+        ME = MappingExplorer(self.problems_list, accelerator_dir, 'Simba', 'MARS', 'v1', self.temp_dir)
+        energy, cycles, edp, area = ME.output
         energy = 0
         cycles = 0
         return [energy, cycles, area]
