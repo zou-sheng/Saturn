@@ -153,7 +153,7 @@ def main():
             with open(os.path.join(benchmark_dir, '{}_workload/layers.yaml'.format(workload)), 'r') as fd:
                 layers = yaml.load(fd, Loader=yaml.SafeLoader)
         
-            report_dir = os.path.join(opt.report_dir, '{}'.format(mapper), '{}'.format(accelerator),'obj_{}'.format(opt.optim_obj),
+            report_dir = os.path.join(opt.report_dir, '{}'.format(search_mode), '{}'.format(mapper), '{}'.format(accelerator),'obj_{}'.format(opt.optim_obj),
                                     '{}_input{}_all_DNN'.format(workload, batch_size))
             os.makedirs(report_dir, exist_ok=True)
             problems_list = []

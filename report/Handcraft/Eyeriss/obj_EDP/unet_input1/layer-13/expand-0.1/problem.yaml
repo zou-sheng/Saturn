@@ -1,0 +1,64 @@
+problem:
+  instance:
+    C: 512
+    H: 1
+    Hdilation: 1
+    Hstride: 2
+    K: 512
+    N: 1
+    P: 52
+    Q: 52
+    R: 2
+    S: 2
+    Wdilation: 1
+    Wstride: 2
+    type: T2D
+  shape:
+    coefficients:
+    - default: 1
+      name: Wstride
+    - default: 1
+      name: Hstride
+    - default: 1
+      name: Wdilation
+    - default: 1
+      name: Hdilation
+    data_spaces:
+    - name: Weights
+      projection:
+      - - - H
+      - - - C
+      - - - K
+      - - - R
+      - - - S
+    - name: Outputs
+      projection:
+      - - - N
+      - - - H
+      - - - K
+      - - - R
+          - Wdilation
+        - - P
+          - Wstride
+      - - - S
+          - Hdilation
+        - - Q
+          - Hstride
+      read_write: true
+    - name: Inputs
+      projection:
+      - - - N
+      - - - H
+      - - - C
+      - - - Q
+      - - - P
+    dimensions:
+    - H
+    - C
+    - K
+    - R
+    - S
+    - N
+    - P
+    - Q
+    name: CNN_Layer

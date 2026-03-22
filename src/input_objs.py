@@ -28,7 +28,6 @@ class Arch:
 
     def get_arch_info_v1(self):
         arch = copy.deepcopy(self.arch_dict)
-        print(self.arch_dict)
         buffer_name_list = []
         buffer_size_list = []
         num_instances = []
@@ -64,6 +63,7 @@ class Arch:
             allowed_sp_size = num_instances[i + 1] // num_instances[i]
             sp_cstr.append(allowed_sp_size)
             if num_instances[i + 1] % num_instances[i] != 0:
+                print(num_instances[i + 1], num_instances[i])
                 raise ValueError('Invalid Architecture File. '
                                  'Buffer hierarchy not perfectly divisible.')
 

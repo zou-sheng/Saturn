@@ -1,0 +1,45 @@
+arch:
+  arithmetic:
+    instances: 256
+    word-bits: 16
+  storage:
+    - name: PsumRegFile
+      entries: 16
+      instances: 256
+      word-bits: 16
+      block-size: 4
+      num-ports: 2
+      num-banks: 1
+    - name: WeightRegFile
+      entries: 192
+      instances: 256
+      word-bits: 16
+      block-size: 4
+      num-ports: 2
+      num-banks: 1
+    - name: InputRegFile
+      entries: 12
+      instances: 256
+      word-bits: 16
+      block-size: 4
+      num-ports: 2
+      num-banks: 1
+    - name: DummyBuffer
+      entries: 4
+      instances: 16
+      word-bits: 16
+      block-size: 4
+      num-ports: 2
+      num-banks: 1
+    - name: GlobalBuffer
+      entries: 131072
+      instances: 1
+      word-bits: 16
+      block-size: 4
+      num-ports: 2
+      num-banks: 32
+    - name: DRAM
+      technology: DRAM
+      instances: 1
+      word-bits: 16
+      bandwidth: 4

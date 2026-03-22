@@ -1,0 +1,31 @@
+arch:
+  arithmetic:
+    instances: 1024
+    word-bits: 8
+  storage:
+    - name: LRF
+      entries: 1
+      instances: 1024
+      word-bits: 8
+      block-size: 1
+      num-ports: 2
+      num-banks: 1
+    - name: RF
+      entries: 2048
+      instances: 4
+      word-bits: 8
+      block-size: 1
+      num-ports: 2
+      num-banks: 1
+    - name: SMEM
+      entries: 262144
+      instances: 1
+      word-bits: 8
+      block-size: 32
+      num-ports: 2
+      num-banks: 2
+    - name: DRAM
+      technology: DRAM
+      instances: 1
+      word-bits: 8
+      bandwidth: 16

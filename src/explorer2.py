@@ -376,7 +376,10 @@ class MappingExplorer:
         self.problem = Prob(prob_path)
         self.buffer_tensor_dict = self.mapspace.buffer_tensor_dict
         self.bypass = self.mapspace.bypass
+
+        # 这个地方有问题，没有根据layer的类型分析每种数据类型包含的维度，而是统一成conv的模式了
         self.tensor_dimensions = self.problem.get_tensor_dimensions()
+        
 
         # self.cost_model = Timeloop(in_config_path='./SpatialAccelerators', out_config_path=self.timeloop_out_config_path,
         #                            accelerator=accelerator, opt_obj=self.opt_obj)
@@ -1002,19 +1005,19 @@ class MappingExplorer:
             prob += spatial_capacity[1] <= 10
             prob += spatial_capacity[1] >= 0
             # WeightBuffer
-            prob += spatial_capacity[2] <= 0
+            prob += spatial_capacity[2] <= 10
             prob += spatial_capacity[2] >= 0
             # InputBuffer
             prob += spatial_capacity[3] <= 0
             prob += spatial_capacity[3] >= 0
             # GlobalBuffer
-            prob += spatial_capacity[4] <= 0
+            prob += spatial_capacity[4] <= 10
             prob += spatial_capacity[4] >= 0
             # DRAM
             prob += spatial_capacity[5] <= 0
             prob += spatial_capacity[5] >= 0
 
-            prob += spatial_capacity[1] + spatial_capacity[2] + spatial_capacity[4] <= 10
+            prob += spatial_capacity[1] + spatial_capacity[2] + spatial_capacity[4] <= 11
             
 
         elif self.accl_name == 'Gemmini':
@@ -1044,6 +1047,8 @@ class MappingExplorer:
             # DRAM
             prob += spatial_capacity[3] <= 0
             prob += spatial_capacity[3] >= 0
+
+            prob += spatial_capacity[1] + spatial_capacity[2]  <= 14
 
             # 正方形阵列
             # prob += spatial_capacity[2] == spatial_capacity[1]
@@ -2600,7 +2605,7 @@ class MappingExplorer:
         for i in range(num_population):
             temporal_tile_weights = []
             spatial_tile_weights = []
-            for n in range(self.weight_num): 
+            for n in range(layer_num): 
                 temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
                 spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
             buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
@@ -2960,11 +2965,11 @@ class MappingExplorer:
         # except Exception as e:
         #     print(f"发生错误: {e}")
         #     rewards = None
-
+        a = (total_cycles, total_energy)
         # finally:
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
-        return rewards, values_list, mapping_list  
+        return rewards, values_list, mapping_list, a  
     
     def thread_fun_DNN(self, p):
         original_dir = os.getcwd()
@@ -5270,6 +5275,7 @@ class MappingExplorer:
                 reward_list = [res[0] for res in results]
                 tile_value_list = [res[1] for res in results]
                 mapping_list = [res[2] for res in results]
+                a = [res[3] for res in results]
                 for idx_prob in range(len(self.problems_list)):
                     current_tile_weights_scores = -float('inf')
                     current_temporal_tile_weights = None
@@ -5281,6 +5287,8 @@ class MappingExplorer:
                             current_tile_weights_scores = tile_value_list[idx_pop][idx_prob][0]
                             current_temporal_tile_weights = population[idx_pop].temporal_tile_weights[idx_prob%self.weight_num]
                             current_spatial_tile_weights = population[idx_pop].spatial_tile_weights[idx_prob%self.weight_num]
+                            # current_temporal_tile_weights = population[idx_pop].temporal_tile_weights[idx_prob]
+                            # current_spatial_tile_weights = population[idx_pop].spatial_tile_weights[idx_prob]
                             current_buffer_temporal_weights = population[idx_pop].buffer_temporal_weights
                             current_buffer_spatial_weights = population[idx_pop].buffer_spatial_weights
 
@@ -5312,8 +5320,10 @@ class MappingExplorer:
                     best_reward = copy.deepcopy(fitness[gen_best_idx])
                     best_sol = copy.deepcopy(population[gen_best_idx])
                     best_values = copy.deepcopy(tile_value_list[gen_best_idx])
+                    best_a = copy.deepcopy(a[gen_best_idx])
                 print(best_values)
                 print(no_mutation)
+                print("total_cycles, total_energy", best_a)
 
                 num_parents = int(num_population * parents_ratio)
                 num_parents = min(num_parents, len(population) - count_non_valid)

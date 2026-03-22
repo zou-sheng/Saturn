@@ -16,9 +16,317 @@ import numpy as np
 from collections import deque
 import time
 
+class HardwareConfig:
+    def __init__(self, name, buffer_hierarchy, NoC, tensor_in_buffer, temporal_tile_weights, spatial_tile_weights, buffer_temporal_weights=None, buffer_spatial_weights=None, buffer_temporal_list=None, buffer_spatial_list=None):
+        self.name = name
+        self.buffer_hierarchy = buffer_hierarchy
+        self.NoC = NoC
+        self.tensor_in_buffer = tensor_in_buffer
+        self.temporal_tile_weights = temporal_tile_weights
+        self.spatial_tile_weights = spatial_tile_weights
+        self.buffer_temporal_weights = buffer_temporal_weights
+        self.buffer_spatial_weights = buffer_spatial_weights
+        # 有n个
+        self.buffer_temporal_orders = None
+        self.buffer_spatial_orders = None
+        self.buffer_capacity = buffer_temporal_list
+        self.spatial_capacity = buffer_spatial_list
+
+        
+    def mutation(self, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+        # self.mutate_noc()
+        # self.mutate_tensor_in_buffer()
+        self.mutate_temporal_tile_weights(best_temporal_tile_weights, no_mutation, alpha=alpha, generation=generation, max_generations=max_generations)
+        self.mutate_spatial_tile_weights(best_spatial_tile_weights, no_mutation, alpha=alpha, generation=generation, max_generations=max_generations)
+        self.mutate_buffer_temporal_weights(best_buffer_temporal_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+        self.mutate_buffer_spatial_weights(best_buffer_spatial_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+        # self.mutate_buffer_temporal_order()
+        # self.mutate_buffer_spatial_order()
+
+    def mutation_for_DNN(self, best_spatial_tile_weights, best_temporal_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+        # self.mutate_noc()
+        # self.mutate_tensor_in_buffer()
+        self.mutate_temporal_tile_weights(best_temporal_tile_weights, no_mutation, alpha=alpha, generation=generation, max_generations=max_generations)
+        self.mutate_spatial_tile_weights(best_spatial_tile_weights, no_mutation, alpha=alpha, generation=generation, max_generations=max_generations)
+        # self.mutate_buffer_temporal_weights(best_buffer_temporal_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+        # self.mutate_buffer_spatial_weights(best_buffer_spatial_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+        # self.mutate_buffer_temporal_order()
+        # self.mutate_buffer_spatial_order()
+
+    def mutate_noc(self):
+        pass
+
+    def mutate_tensor_in_buffer(self):
+        pass
+
+    def mutate_temporal_tile_weights(self, best_temporal_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+        layer_num = len(self.temporal_tile_weights)
+        for i in range(layer_num):
+            if no_mutation[i] == True:
+                self.temporal_tile_weights[i] = self.temporal_tile_weights[i]
+                continue
+            if random.random() < 0.7:
+                self.temporal_tile_weights[i] = best_temporal_tile_weights[i]
+            else:
+                if random.random() < 0.7:
+                    self.gaussian_mutation(self.temporal_tile_weights[i], alpha=alpha, generation=generation, max_generations=max_generations)
+                else:
+                    self.mutate_factor(self.temporal_tile_weights[i], alpha=alpha, generation=generation, max_generations=max_generations)
+                self.shuffle_order(self.temporal_tile_weights[i], alpha=alpha)
+
+    def mutate_spatial_tile_weights(self, best_spatial_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+        layer_num = len(self.spatial_tile_weights)
+        for i in range(layer_num):
+            if no_mutation[i] == True:
+                self.spatial_tile_weights[i] = self.spatial_tile_weights[i]
+                continue
+            if random.random() < 0.7:
+                self.spatial_tile_weights[i] = best_spatial_tile_weights[i]
+            else:
+                if random.random() < 0.7:
+                    self.gaussian_mutation(self.spatial_tile_weights[i], alpha=alpha, generation=generation, max_generations=max_generations)
+                else:
+                    self.mutate_factor(self.spatial_tile_weights[i], alpha=alpha, generation=generation, max_generations=max_generations)
+                self.shuffle_order(self.spatial_tile_weights[i], alpha=alpha)
+
+    def mutate_buffer_temporal_weights(self, best_buffer_temporal_weights, alpha=0.5, generation=0, max_generations=100):
+        if random.random() < 0.7:
+            self.buffer_temporal_weights = random.choice(best_buffer_temporal_weights)
+        else:
+            self.mutate_factor(self.buffer_temporal_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+            self.shuffle_order(self.buffer_temporal_weights)
+
+    def mutate_buffer_spatial_weights(self, best_buffer_spatial_weights, alpha=0.5, generation=0, max_generations=100):
+        if random.random() < 0.7:
+            self.buffer_spatial_weights = random.choice(best_buffer_spatial_weights)
+        else:
+            self.mutate_factor(self.buffer_spatial_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+            self.shuffle_order(self.buffer_spatial_weights)
+
+    def mutate_buffer_temporal_order(self):
+        pass
+
+    def mutate_buffer_spatial_order(self):
+        pass
+
+    def gaussian_mutation(self, arr, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
+        """
+        带自适应步长的高斯变异算子
+        
+        参数:
+        - arr: 待变异的参数矩阵 (numpy array)
+        - alpha: 变异概率 (0.0-1.0)
+        - generation: 当前迭代代数
+        - max_generations: 总迭代代数
+        - sigma_base: 基础标准差，控制变异步长
+        
+        返回:
+        - 变异后的参数矩阵
+        """
+        # 自适应标准差：随迭代进行减小步长（早期探索，后期开发）
+        decay_factor = 1.0 - (generation / max_generations) * 0.7
+        sigma = sigma_base * decay_factor
+        
+        if arr.ndim == 2:
+            rows, cols = arr.shape
+            for i in range(rows):
+                for j in range(cols):
+                    if random.random() < alpha:  # 以alpha概率进行变异
+                        # 添加高斯噪声
+                        arr[i, j] += np.random.normal(0, sigma)
+                        
+                        # 可选：限制参数范围（根据实际需求调整）
+                        # arr[i, j] = np.clip(arr[i, j], 0, 1)  # 例如限制在[0,1]
+        else:  # 一维数组处理
+            for i in range(len(arr)):
+                if random.random() < alpha:
+                    arr[i] += np.random.normal(0, sigma)
+                    # arr[i] = np.clip(arr[i], 0, 1)
+        
+        return arr
+    
+    def mutate_factor(self, arr, alpha=0.5, generation=0, max_generations=100):
+        """带自适应幅度的因子变异"""
+        # 变异幅度随代数衰减（早期探索，后期开发）
+        decay_factor = 1.0 - (generation / max_generations) * 0.7
+        
+        if arr.ndim == 2:
+            rows, cols = arr.shape
+            for i in range(rows):
+                for j in range(cols):
+                    if random.random() < alpha:
+                        # 随机选择变异方向（增大或减小）
+                        if random.random() < 0.5:
+                            # 增大因子（但幅度随迭代减小）
+                            arr[i, j] *= (1 + 0.5 * decay_factor)
+                        else:
+                            # 减小因子
+                            arr[i, j] *= (1 - 0.3 * decay_factor)
+        else:
+            for i in range(len(arr)):
+                if random.random() < alpha:
+                    if random.random() < 0.5:
+                        arr[i] *= (1 + 0.5 * decay_factor)
+                    else:
+                        arr[i] *= (1 - 0.3 * decay_factor)
+        
+        return arr
+
+    def shuffle_order(self, arr, alpha=0.5):
+        if arr.ndim == 1:
+            # 一维数组处理
+            if random.random() < alpha:
+                np.random.shuffle(arr)
+
+        elif arr.ndim == 2:
+            # 二维数组处理
+            for row in arr:
+                if random.random() < alpha:
+                    np.random.shuffle(row)
+
+        else:
+            raise ValueError("输入数组必须是一维或二维")
+        
+    def crossover_2D(self, dad, mom, best_matrix, no_mutation, alpha=0.5):
+        if no_mutation:
+            dad = dad
+            mom = mom
+        elif random.random() < 0.7:
+            dad = best_matrix
+            mom = best_matrix
+        else:
+            # 随机选择交叉策略
+            crossover_type = random.choice(['row_column', 'multi_point', 'arithmetic'])
+            
+            if crossover_type == 'row_column':
+                # 行/列交叉（原始实现）
+                if random.random() < alpha:
+                    if dad.ndim == 2 and random.random() < 0.5:
+                        # 行交叉
+                        row_cutoff = random.randint(1, dad.shape[0]-1)
+                        dad[row_cutoff:], mom[row_cutoff:] = mom[row_cutoff:], dad[row_cutoff:]
+                    else:
+                        # 列交叉
+                        if dad.ndim == 1:
+                            col_cutoff = random.randint(1, len(dad)-1)
+                        else:
+                            col_cutoff = random.randint(1, dad.shape[1]-1)
+                        dad[:, col_cutoff:], mom[:, col_cutoff:] = mom[:, col_cutoff:], dad[:, col_cutoff:]
+            
+            elif crossover_type == 'multi_point':
+                # 多点交叉
+                if dad.ndim == 2:
+                    rows, cols = dad.shape
+                    for i in range(rows):
+                        if random.random() < alpha:
+                            # 随机选择多个交叉点
+                            num_points = random.randint(1, cols//2)
+                            points = sorted(random.sample(range(1, cols), num_points))
+                            for j in range(len(points)):
+                                if j % 2 == 0:  # 交替交换片段
+                                    start = points[j]
+                                    end = points[j+1] if j+1 < len(points) else cols
+                                    dad[i, start:end], mom[i, start:end] = mom[i, start:end], dad[i, start:end]
+                else:
+                    if random.random() < alpha:
+                        num_points = random.randint(1, len(dad)//2)
+                        points = sorted(random.sample(range(1, len(dad)), num_points))
+                        for j in range(len(points)):
+                            if j % 2 == 0:
+                                start = points[j]
+                                end = points[j+1] if j+1 < len(points) else len(dad)
+                                dad[start:end], mom[start:end] = mom[start:end], dad[start:end]
+        
+            elif crossover_type == 'arithmetic':
+                # 算术交叉：生成介于父代之间的子代
+                if dad.ndim == 2:
+                    rows, cols = dad.shape
+                    for i in range(rows):
+                        for j in range(cols):
+                            if random.random() < alpha:
+                                beta = random.uniform(0.3, 0.7)  # 控制混合比例
+                                tmp = beta * dad[i, j] + (1-beta) * mom[i, j]
+                                mom[i, j] = beta * mom[i, j] + (1-beta) * dad[i, j]
+                                dad[i, j] = tmp
+                else:
+                    for i in range(len(dad)):
+                        if random.random() < alpha:
+                            beta = random.uniform(0.3, 0.7)
+                            tmp = beta * dad[i] + (1-beta) * mom[i]
+                            mom[i] = beta * mom[i] + (1-beta) * dad[i]
+                            dad[i] = tmp
+
+    def crossover_1D(self, dad, mom, best_array, alpha=0.5):
+        if random.random() < 0.3:
+            dad = random.choice(best_array)
+            mom = random.choice(best_array)
+        else:
+            if random.random() < alpha:
+                col_cutoff = random.randint(1, len(dad)-1)
+                dad[col_cutoff:], mom[col_cutoff:] = mom[col_cutoff:], dad[col_cutoff:]
+
+    def crossover(self, other, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5):
+        # NoC
+
+        # tensor_in_buffer
+
+        # temporal_tile_weights
+        layer_num = len(self.temporal_tile_weights)
+        for i in range(layer_num):
+            self.crossover_2D(self.temporal_tile_weights[i], other.temporal_tile_weights[i], best_temporal_tile_weights, no_mutation[i])
+
+        # spatial_tile_weights
+        for i in range(layer_num):
+            self.crossover_2D(self.spatial_tile_weights[i], other.spatial_tile_weights[i], best_spatial_tile_weights, no_mutation[i])
+
+        # buffer_temporal_weights
+        self.crossover_1D(self.buffer_temporal_weights, other.buffer_temporal_weights, best_buffer_temporal_weights)
+
+        # buffer_spatial_weights
+        self.crossover_1D(self.buffer_spatial_weights, other.buffer_spatial_weights, best_buffer_spatial_weights)
+
+        # buffer_temporal_order
+
+        # buffer_spatial_order
+
+    def crossover_for_DNN(self, other, best_spatial_tile_weights, best_temporal_tile_weights, no_mutation, alpha=0.5):
+        # NoC
+
+        # tensor_in_buffer
+
+        # temporal_tile_weights
+        layer_num = len(self.temporal_tile_weights)
+        for i in range(layer_num):
+            self.crossover_2D(self.temporal_tile_weights[i], other.temporal_tile_weights[i], best_temporal_tile_weights, no_mutation)
+
+        # spatial_tile_weights
+        for i in range(layer_num):
+            self.crossover_2D(self.spatial_tile_weights[i], other.spatial_tile_weights[i], best_spatial_tile_weights, no_mutation)
+
+        # # buffer_temporal_weights
+        # self.crossover_1D(self.buffer_temporal_weights, other.buffer_temporal_weights, best_buffer_temporal_weights)
+
+        # # buffer_spatial_weights
+        # self.crossover_1D(self.buffer_spatial_weights, other.buffer_spatial_weights, best_buffer_spatial_weights)
+
+        # buffer_temporal_order
+
+        # buffer_spatial_order
+
+    def get_target(self):
+        pass
+
+    def get_tiles_type(self):
+        pass
+
+    def get_bypass(self):
+        pass
+
+
+
 
 class MappingExplorer:
-    def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, version, report_dir):
+    def __init__(self, operator_instance, buffer_capacity, spatial_capacity, accelerator, mapper, version, report_dir):
         self.accl_name = accelerator
         self.fitness_obj = ['EDP']
         self.timeloop_out_config_path = f'./tmp/out_config_{datetime.now().strftime("%H:%M:%S")}'
@@ -34,19 +342,13 @@ class MappingExplorer:
         self.report_dir = report_dir 
         self.mapper = mapper
 
-        arch_path = accelerator_dir
+        arch_path = pathlib.Path('{}/{}.yaml'.format(report_dir, 'arch')).resolve()
         self.accelerator = Arch(arch_path, accelerator, version)
-        mapspace_path = pathlib.Path('{}/{}/{}/{}.yaml'.format(accelerator_dir, mapper, accelerator, 'mapspace')).resolve()
-        
-        print("mapspace_path:", mapspace_path)  # 打印路径
-        print("路径是否存在：", os.path.exists(mapspace_path))  # 检查路径是否存在
-        print("路径是否是文件：", os.path.isfile(mapspace_path))  # 检查是否是文件
+        mapspace_path = pathlib.Path('{}/{}.yaml'.format(report_dir, 'mapspace')).resolve()
         self.mapspace = Mapspace(mapspace_path)
-        prob_path = pathlib.Path('{}/{}/{}/{}.yaml'.format(accelerator_dir, mapper, accelerator, 'problem')).resolve()
-        self.problem = Prob(prob_path)
         self.buffer_tensor_dict = self.mapspace.buffer_tensor_dict
         self.bypass = self.mapspace.bypass
-        self.tensor_dimensions = self.problem.get_tensor_dimensions()
+        self.tensor_dimensions = {'Weights': [0, 1, 4, 5, 6], 'Inputs': [0, 1, 2, 3, 4, 6, 7], 'Outputs': [2, 3, 5, 6, 7]}
 
         # self.cost_model = Timeloop(in_config_path='./SpatialAccelerators', out_config_path=self.timeloop_out_config_path,
         #                            accelerator=accelerator, opt_obj=self.opt_obj)
@@ -60,11 +362,7 @@ class MappingExplorer:
         self.num_buffer_level = num_buffer_levels
 
 
-
-        self.dimension, self.dimension_dict = self.problem.get_problem_info()
-
-
-       
+      
         # 用于存储temporal层级
         self.temporal_level = {}
         # 用于存储spatial层级
@@ -99,13 +397,18 @@ class MappingExplorer:
             buffer_name = self.buffer_name_list[key]
             self.obj_level.append(self.temporal_level[buffer_name])
 
-        if self.accl_name == 'Simba':
+        if self.accl_name == "Simba":
             self.buffer_hierarchy = ['Registers', 'AccumulationBuffer', 'WeightBuffer', 'InputBuffer', 'GlobalBuffer', 'DRAM']
             self.tensor_in_buffer = {'Registers': ['Weights'], 'AccumulationBuffer': ['Outputs'], 'WeightBuffer': ['Weights'], 'InputBuffer': ['Inputs'], 'GlobalBuffer': ['Inputs','Outputs'], 'DRAM': ['Weights','Inputs','Outputs']}
-            # self.buffer_capacity = buffer_capacity
-            # self.spatial_capacity = spatial_capacity
+            self.buffer_capacity = buffer_capacity
+            self.spatial_capacity = spatial_capacity
+        elif self.accl_name == "Gemmini":
+            self.buffer_hierarchy = ['Registers', 'Accumulator', 'Scratchpad', 'DRAM']
+            self.tensor_in_buffer = {'Registers': ['Weights'], 'Accumulator': ['Outputs'], 'Scratchpad': ['Inputs', 'Weights'], 'DRAM': ['Weights','Inputs','Outputs']}
+            self.buffer_capacity = buffer_capacity
+            self.spatial_capacity = spatial_capacity
         else:
-            print("未定义")
+            print("未定义1", self.accl_name == "Simba")
             exit()
   
     def generate_mapping(self, dimension, p):
@@ -120,8 +423,10 @@ class MappingExplorer:
     def lpsolver_all_DNN(self, dimension_list, p):
         if self.accl_name == "Simba":
             rows = 6
+        elif self.accl_name == "Gemmini":
+            rows = 4
         else:
-            print("未定义")
+            print("未定义", self.accl_name)
             exit()
         cols = 8 # 问题维度R, S, P, Q, C, K, H, N
 
@@ -132,9 +437,8 @@ class MappingExplorer:
         spatial_tiles = [[[LpVariable(f"st_{i}_{j}_{k}", lowBound=0) for j in range(cols)] for i in range(rows)] for k in range(len(dimension_list))]
         temporal_tiles = [[[LpVariable(f"tt_{i}_{j}_{k}", lowBound=0) for j in range(cols)] for i in range(rows)] for k in range(len(dimension_list))]
 
-        temporal_tiles_weight = p[:rows]
-        spatial_tiles_weight = p[rows:]
-        
+        temporal_tiles_weight = p.spatial_tile_weights
+        spatial_tiles_weight = p.temporal_tile_weights
         # 定义目标函数：矩阵元素的加权和
         objective = 0
         for k in range(len(dimension_list)):
@@ -161,7 +465,7 @@ class MappingExplorer:
                             buf_capacity += temporal_tiles[k][i][dim]
                             buf_capacity += spatial_tiles[k][i][dim]
                 
-                prob += buf_capacity <= len(tensors_list)*(self.buffer_capacity[r] - math.log2(len(tensors_list)))
+                prob += buf_capacity <= len(tensors_list)*(math.log2(self.buffer_capacity[r]) - math.log2(len(tensors_list)))
 
             
         # 并行容量约束
@@ -170,7 +474,7 @@ class MappingExplorer:
                 sp_capacity = 0
                 for c in range(cols):
                     sp_capacity += spatial_tiles[k][r][c]
-                prob += sp_capacity <= self.spatial_capacity[r]
+                prob += sp_capacity <= math.log2(self.spatial_capacity[r])
 
         # 维度约束
         for k in range(len(dimension_list)):
@@ -200,8 +504,119 @@ class MappingExplorer:
     
     def _integerize_with_staged_optimization_with_config_all_DNN(self, solutions, p):
         
-        pass
+        # 计算最后一行
+        def compute_last_row(dimension, spatial_tiles, temporal_tiles):
 
+            spatial_prod = np.prod(spatial_tiles, axis=0, dtype=np.float64)
+            temporal_prod = np.prod(temporal_tiles[:-1], axis=0, dtype=np.float64)
+            last_row = np.ceil(np.array(dimension) / (spatial_prod*temporal_prod)).astype(int)
+
+            return last_row
+        
+        # 计算最小硬件开销
+        def min_hardware_config(spatial_tiles_list, temporal_tiles_list):
+            """
+            计算多个矩阵对应的最小硬件配置（每个约束维度取所有矩阵的最小值）
+            
+            参数:
+                data_list: 包含多个矩阵的列表（每个元素是一个矩阵，对应原data）
+            返回:
+                最小硬件配置列表（每个元素对应一个约束的最小值）
+            """
+            # 先收集每个矩阵的硬件配置
+            all_configs = []
+            for k in range(len(spatial_tiles_list)):
+
+                spatial_config = []
+                buffer_config = []
+                # 1. 并行容量约束
+                for r in range(len(p.buffer_hierarchy)):
+                    spatial_capacity = np.prod(spatial_tiles_list[k][r])
+                    spatial_config.append(spatial_capacity)
+                # 2. 除DRAM外的存储层次容量约束
+                # 去掉DRAM
+                for r in range(len(p.buffer_hierarchy)-1):
+                    buffer_capacity = 0
+                    tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[r]]
+                    for tensor in tensors_list:
+                        tensor_capacity = 1
+                        if tensor == 'Inputs':
+                            R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
+                            for l in range(r+1):
+                                R *= spatial_tiles_list[k][l][0]
+                                S *= spatial_tiles_list[k][l][1]
+                                P *= spatial_tiles_list[k][l][2]
+                                Q *= spatial_tiles_list[k][l][3]
+                                C *= spatial_tiles_list[k][l][4]
+                                K *= spatial_tiles_list[k][l][5]
+                                H *= spatial_tiles_list[k][l][6]
+                                N *= spatial_tiles_list[k][l][7]
+                                R *= temporal_tiles_list[k][l][0]
+                                S *= temporal_tiles_list[k][l][1]
+                                P *= temporal_tiles_list[k][l][2]
+                                Q *= temporal_tiles_list[k][l][3]
+                                C *= temporal_tiles_list[k][l][4]
+                                K *= temporal_tiles_list[k][l][5]
+                                H *= temporal_tiles_list[k][l][6]
+                                N *= temporal_tiles_list[k][l][7]
+                            tensor_capacity = N*((P-1)*self.problems_list[k]['problem']['instance']['Wstride']+1+self.problems_list[k]['problem']['instance']['Wdilation']*(R-1))*((Q-1)*self.problems_list[k]['problem']['instance']['Hstride']+1+self.problems_list[k]['problem']['instance']['Hdilation']*(S-1))*C*H
+                          
+                        else:
+                            for l in range(r+1):
+                                for dim in self.tensor_dimensions[tensor]:
+                                    tensor_capacity *= spatial_tiles_list[k][l][dim]
+                                    tensor_capacity *= temporal_tiles_list[k][l][dim]
+                        buffer_capacity += tensor_capacity
+                    buffer_config.append(buffer_capacity)
+                all_configs.append([spatial_config, buffer_config])
+            # 对每个约束维度取所有矩阵的最大值（即最小硬件配置）
+            max_spatial = [max(col) for col in zip(*[cfg[0] for cfg in all_configs])]
+            max_buffer = [max(col) for col in zip(*[cfg[1] for cfg in all_configs])]
+            min_config = [max_spatial, max_buffer]
+            return min_config
+        
+        def safe_ceil(x, eps=1e-6):
+            """安全向上取整，避免因浮点误差导致1.0000001被取为2"""
+            # 先四舍五入到eps精度（如1e-6），消除微小误差
+            x_rounded = np.around(x, decimals=3)  # 保留6位小数，可根据需要调整
+            # 若修正后的值与某个整数的差小于eps，则视为该整数
+            integer_part = np.floor(x_rounded)
+            if x_rounded - integer_part < eps:
+                return int(integer_part)
+            else:
+                # 确实需要向上取整的情况（如1.1 → 2）
+                return int(np.ceil(x_rounded))
+
+        
+        spatial_tiles_solution = solutions[0]
+        temporal_tiles_solution = solutions[1]
+        
+        
+        spatial_tiles_list = []
+        temporal_tiles_list = []
+        datas = []
+        for i in range(len(solutions[0])):
+            tile_matrix = np.array(temporal_tiles_solution[i])
+            # 用vectorize实现批量处理（效率较高）
+            safe_ceil_vec = np.vectorize(safe_ceil)
+            tile_matrix_int = safe_ceil_vec(tile_matrix).astype(int)
+            temporal_tiles_list.append(tile_matrix_int)
+            tile_matrix = np.array(spatial_tiles_solution[i])
+            # 用vectorize实现批量处理（效率较高）
+            safe_ceil_vec = np.vectorize(safe_ceil)
+            tile_matrix_int = safe_ceil_vec(tile_matrix).astype(int)
+            spatial_tiles_list.append(tile_matrix_int)
+            
+            # spatial_tiles_list.append(np.ceil(spatial_tiles_solution[i]).astype(int))
+            # temporal_tiles_list.append(np.ceil(temporal_tiles_solution[i]).astype(int))
+        
+        config = min_hardware_config(spatial_tiles_list, temporal_tiles_list)
+        
+        new_data = []
+        for i in range(len(solutions[0])):
+            last_row = compute_last_row(self.tensor_dimensions_list[i], spatial_tiles_list[i], temporal_tiles_list[i])
+            new_data.append((spatial_tiles_list[i], np.vstack((temporal_tiles_list[i][:-1], last_row))))
+        return new_data, config
 
     def _integerize_with_staged_optimization(self, solution, p):
         def calculate_remaining_capacity(data, fixed_rows):
@@ -383,39 +798,120 @@ class MappingExplorer:
         except:
             return None
     
+    def generate_mapping_and_config_for_all_DNN(self, dimensions_list, p):
+        sols, cfg = self.lpsolver_all_DNN(dimensions_list, p)
+        mapping_list = []
+        for i in range(len(sols)):
+            # 如果要探索更多的配置，这部分需要修改
+            mapping_dict = utils.generate_mapping_for_lpsolver3(sols[i], p)
+            mapping_list.append(mapping_dict)
+        arch_dict = utils.generate_accelerator(cfg, p)
+        return mapping_list, None, arch_dict
     
     def thread_fun_p(self, p):
         original_dir = os.getcwd()
         # 创建一个唯一的临时文件夹
         temp_dir = f'{original_dir}/mars_tmp/temp_{uuid.uuid4()}'
         os.makedirs(temp_dir)
-        try:
-            mapping, _ = self.generate_mapping(self.dimension, p)
-            mapping = Mapping(mapping)
+        rewards = []
         # try:
+        mapping_list, _, arch = self.generate_mapping_and_config_for_all_DNN(self.tensor_dimensions_list, p)
+        
+        
+        # 初始化存储列表（记录每层原始值，而非奖励值）
+        values_list = []
+        # 原始指标存储（用于计算聚合值）
+        raw_metrics = {
+            "cycles": [], "energy": [], "utilization": [], 
+            "GFLOPs": [], "EDP": []  # 保留各层EDP仅作备份
+        }
+        utils.store_yaml(f'{temp_dir}/temp_arch.yaml', arch)
+        for i in range(len(mapping_list)):
+            mapping = Mapping(mapping_list[i])
             remainders = {}
             outermost_idx = {}
+            problem = self.problems_list[i]
+            
+            # 计算remainders和outermost_idx（原有逻辑不变）
             for d in mapping.factor_dict.keys():
-                T = self.dimension_dict[d]
+                T = problem['problem']['instance'][d]
                 F = mapping.factor_dict[d]
-                remainders[d], outermost_idx[d] = utils.find_remainders(F[::-1], T)
-                
+                remainders[d], outermost_idx[d] = utils.find_remainders2(F[::-1], T)
             
-            temp_mapping = utils.generate_mapping(mapping.factor_dict, mapping.permutation_list, mapping.target_list, mapping.type_list, mapping.bypass_list, remainders, outermost_idx)
-            
+            # 生成临时映射并运行timeloop（原有逻辑不变）
+            temp_mapping = utils.generate_mapping(
+                mapping.factor_dict, mapping.permutation_list, 
+                mapping.target_list, mapping.type_list, 
+                mapping.bypass_list, remainders, outermost_idx
+            )
             output_stats_path = os.path.join(temp_dir, 'timeloop-model.stats.txt')
-            utils.store_yaml(f'{temp_dir}/temp.yaml', temp_mapping)
-            utils.store_yaml(f'{temp_dir}/temp_prob.yaml', self.problem.problem)
-            utils.store_yaml(f'{temp_dir}/temp_arch.yaml', self.accelerator.arch_dict)
-            utils.run_timeloop(f'{temp_dir}/temp_arch.yaml', f'{temp_dir}/temp_prob.yaml', f'{temp_dir}/temp.yaml', cwd=temp_dir)
-            try:
-                self.observation = utils.parse_timeloop_output(output_stats_path)
-            except:
-                pass
-        finally:
-            if os.path.exists(temp_dir):
-                shutil.rmtree(temp_dir)
-        return self.judge()
+            utils.store_yaml(f'{temp_dir}/{i}_temp.yaml', temp_mapping)
+            utils.store_yaml(f'{temp_dir}/{i}_temp_prob.yaml', problem)
+            utils.run_timeloop(
+                f'{temp_dir}/temp_arch.yaml', 
+                f'{temp_dir}/{i}_temp_prob.yaml', 
+                f'{temp_dir}/{i}_temp.yaml', 
+                cwd=temp_dir
+            )
+            
+            # 解析输出并记录原始指标（核心修改：先存原始值，再算奖励）
+            self.observation = utils.parse_timeloop_output(output_stats_path)
+            if self.observation is not None:
+                # 记录当前层的原始指标（未取负/未加工）
+                for metric in raw_metrics.keys():
+                    raw_metrics[metric].append(self.observation.get(metric, 0.0))
+                # 生成当前层的奖励值（仅用于记录，最终奖励从原始值聚合计算）
+                values = self.judge()
+                values_list.append(values)
+            else:
+                values_list.append(None)
+
+        # -------------- 核心：按合理逻辑计算聚合指标 --------------
+        rewards = []
+        # 1. 先计算总cycles和总energy（基础指标）
+        total_cycles = sum(raw_metrics["cycles"])
+        total_energy = sum(raw_metrics["energy"])
+        # 2. 遍历fitness_obj，按指标类型计算聚合值
+        fitness_obj = self.fitness_obj
+        for term in fitness_obj:
+            if term == "cycles":
+                # 总周期：直接累加
+                rewards.append(-total_cycles)  # 负号：周期越少奖励越高
+            elif term == "energy":
+                # 总能耗：直接累加
+                rewards.append(-total_energy)  # 负号：能耗越少奖励越高
+            elif term == "EDP":
+                # 总EDP：总周期 × 总能耗
+                total_edp = total_cycles * total_energy * 0.000001
+                rewards.append(-total_edp)  # 负号：EDP越小奖励越高
+            elif term == "utilization":
+                # 利用率：有效算力加权平均（权重=各层cycles占比）
+                if total_cycles == 0:
+                    avg_util = 0.0
+                else:
+                    # 加权平均：(util1×cycles1 + util2×cycles2 + ...) / 总cycles
+                    weighted_util = sum(u * c for u, c in zip(raw_metrics["utilization"], raw_metrics["cycles"]))
+                    avg_util = weighted_util / total_cycles
+                rewards.append(avg_util)  # 正号：利用率越高奖励越高
+            elif term == "GFLOPs":
+                # GFLOPs：总算力 / 总时间（这里用总cycles近似时间）
+                if total_cycles == 0:
+                    total_gflops = 0.0
+                else:
+                    # 总算力=各层GFLOPs×各层cycles（因为GFLOPs是“每秒算力”，乘时间=总算力）
+                    total_compute = sum(g * c for g, c in zip(raw_metrics["GFLOPs"], raw_metrics["cycles"]))
+                    total_gflops = total_compute / total_cycles
+                rewards.append(total_gflops)  # 正号：算力越高奖励越高
+            else:
+                raise NameError(f'Undefined fitness type: {term}')
+        # except Exception as e:
+        #     print(f"发生错误: {e}")
+        #     rewards = None
+
+        # finally:
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+        return rewards, values_list, mapping_list
 
     def select_parents(self, pop, fitness, num_parents, num_population, stage_idx=0, first_stage_value=None):
         # 选择在当前代中表现最好的个体作为下一代后代的父母
@@ -437,254 +933,94 @@ class MappingExplorer:
 
         return new_pop, new_fitness, parents
 
-
-    def run_parameters(self, stage_idx=0, prev_stage_value=0, num_population=10, num_generations=100, elite_ratio=0.05,
-                       parents_ratio=0.15, ratio_decay=1, num_finetune=1):
-        row = len(self.temporal_level) + len(self.spatial_level)
+    def create_genome_for_parameters3(self, num_population):
+        pop = []
+        buffer_hierarchy = ['Registers', 'AccumulationBuffer', 'WeightBuffer', 'InputBuffer', 'GlobalBuffer', 'DRAM']
+        tensor_in_buffer = {'Registers': ['Weights'], 'AccumulationBuffer': ['Outputs'], 'WeightBuffer': ['Weights'], 'InputBuffer': ['Inputs'], 'GlobalBuffer': ['Inputs','Outputs'], 'DRAM': ['Weights','Inputs','Outputs']}
+        layer_num = len(self.problems_list)
+        row = len(buffer_hierarchy)
         col = 8
+        for i in range(num_population):
+            temporal_tile_weights = []
+            spatial_tile_weights = []
+            for n in range(layer_num): 
+                temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
+                spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
+            buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
+            buffer_spatial_weights = np.random.randint(10, 100, size=row).astype(float)
+            p = HardwareConfig("Simba", buffer_hierarchy, 0, tensor_in_buffer, temporal_tile_weights, spatial_tile_weights, buffer_temporal_weights, buffer_spatial_weights)
+            pop.append(p)
+        return pop
+    
+    def create_genome_for_gemmini(self, num_population):
+        pop = []
+        buffer_hierarchy = ['Registers', 'Accumulator', 'Scratchpad', 'DRAM']
+        tensor_in_buffer = {'Registers': ['Weights'], 'Accumulator': ['Outputs'], 'Scratchpad': ['Inputs', 'Weights'], 'DRAM': ['Weights','Inputs','Outputs']}
+        # tensor_in_buffer = {'Registers': ['Weights'], 'Accumulator': ['Weights'], 'Scratchpad': ['Weights', 'Inputs', 'Outputs'], 'DRAM': ['Weights','Inputs','Outputs']}
+        layer_num = len(self.problems_list)
+        row = len(buffer_hierarchy)
+        col = 8
+        for i in range(num_population):
+            temporal_tile_weights = []
+            spatial_tile_weights = []
+            for n in range(layer_num): 
+                temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
+                spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
+            buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
+            buffer_spatial_weights = np.random.randint(10, 100, size=row).astype(float)
+            p = HardwareConfig("Gemmini", buffer_hierarchy, 0, tensor_in_buffer, temporal_tile_weights, spatial_tile_weights, buffer_temporal_weights, buffer_spatial_weights)
+            pop.append(p)
+        return pop
 
-        def crossover_tile(parents, pop, row, alpha=0.5):
-            if len(parents) ==1:
+    def run(self, stage_idx=0, prev_stage_value=0, num_population=10, num_generations=100, elite_ratio=0.05,
+                       parents_ratio=0.15, ratio_decay=1, num_finetune=1):
+        def crossover(parents, pop, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5):
+            if len(parents) == 1:
                 for idx in range(len(pop)):
                     pop[idx] = copy.deepcopy(parents[0])
             else:
                 for idx in range(0, len(pop), 2):
                     dad = copy.deepcopy(parents[random.randint(0, len(parents)-1)])
                     mom = copy.deepcopy(parents[random.randint(0, len(parents)-1)])
-                    
-                    # 随机选择交叉策略
-                    crossover_type = random.choice(['row_column', 'multi_point', 'arithmetic'])
-                    
-                    if crossover_type == 'row_column':
-                        # 行/列交叉（原始实现）
-                        if random.random() < alpha:
-                            if dad.ndim == 2 and random.random() < 0.5:
-                                # 行交叉
-                                row_cutoff = random.randint(1, min(row, dad.shape[0])-1)
-                                dad[row_cutoff:row], mom[row_cutoff:row] = mom[row_cutoff:row], dad[row_cutoff:row]
-                            else:
-                                # 列交叉
-                                if dad.ndim == 1:
-                                    col_cutoff = random.randint(1, len(dad)-1)
-                                else:
-                                    col_cutoff = random.randint(1, dad.shape[1]-1)
-                                dad[:row, col_cutoff:], mom[:row, col_cutoff:] = mom[:row, col_cutoff:], dad[:row, col_cutoff:]
-                    
-                    elif crossover_type == 'multi_point':
-                        # 多点交叉
-                        if dad.ndim == 2:
-                            cols = dad.shape[1]
-                            for i in range(min(row, dad.shape[0])):
-                                if random.random() < alpha:
-                                    # 随机选择多个交叉点
-                                    num_points = random.randint(1, cols//2)
-                                    points = sorted(random.sample(range(1, cols), num_points))
-                                    for j in range(len(points)):
-                                        if j % 2 == 0:  # 交替交换片段
-                                            start = points[j]
-                                            end = points[j+1] if j+1 < len(points) else cols
-                                            dad[i, start:end], mom[i, start:end] = mom[i, start:end], dad[i, start:end]
-                        else:
-                            if random.random() < alpha:
-                                num_points = random.randint(1, len(dad)//2)
-                                points = sorted(random.sample(range(1, len(dad)), num_points))
-                                for j in range(len(points)):
-                                    if j % 2 == 0:
-                                        start = points[j]
-                                        end = points[j+1] if j+1 < len(points) else len(dad)
-                                        dad[start:end], mom[start:end] = mom[start:end], dad[start:end]
-                    
-                    elif crossover_type == 'arithmetic':
-                        # 算术交叉：生成介于父代之间的子代
-                        if dad.ndim == 2:
-                            cols = dad.shape[1]
-                            for i in range(min(row, dad.shape[0])):
-                                for j in range(cols):
-                                    if random.random() < alpha:
-                                        beta = random.uniform(0.3, 0.7)  # 控制混合比例
-                                        tmp = beta * dad[i, j] + (1-beta) * mom[i, j]
-                                        mom[i, j] = beta * mom[i, j] + (1-beta) * dad[i, j]
-                                        dad[i, j] = tmp
-                        else:
-                            for i in range(len(dad)):
-                                if random.random() < alpha:
-                                    beta = random.uniform(0.3, 0.7)
-                                    tmp = beta * dad[i] + (1-beta) * mom[i]
-                                    mom[i] = beta * mom[i] + (1-beta) * dad[i]
-                                    dad[i] = tmp
-                    
-                    # 后row行交叉（仅行交叉）
-                    if random.random() < alpha:
-                        if dad.ndim == 2 and row < dad.shape[0]:  # 确保有后row行
-                            # 行交叉（后row行）
-                            start_row = row
-                            end_row = min(2*row, dad.shape[0])
-                            if end_row > start_row + 1:  # 确保有足够的行进行交叉
-                                row_cutoff = random.randint(start_row + 1, end_row - 1)
-                                dad[row_cutoff:end_row], mom[row_cutoff:end_row] = mom[row_cutoff:end_row], dad[row_cutoff:end_row]
-            
 
+                    dad.crossover(mom, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha)
                     pop[idx] = dad
                     if idx + 1 < len(pop):
                         pop[idx+1] = mom
-
         
-        def shuffle_order(arr, alpha=0.5):
-            if arr.ndim == 1:
-                # 一维数组处理
-                if random.random() < alpha:
-                    np.random.shuffle(arr)
-
-            elif arr.ndim == 2:
-                # 二维数组处理
-                for row in arr:
-                    if random.random() < alpha:
-                        np.random.shuffle(row)
-
-            else:
-                raise ValueError("输入数组必须是一维或二维")
-            
-        def mutate_factor(arr, row, alpha=0.5, generation=0, max_generations=100):
-            """带自适应幅度的因子变异"""
-            # 变异幅度随代数衰减（早期探索，后期开发）
-            decay_factor = 1.0 - (generation / max_generations) * 0.7
-            
-            if arr.ndim == 2:
-                rows, cols = arr.shape
-                # 仅处理前row行
-                for i in range(min(row, rows)):
-                    for j in range(cols):
-                        if random.random() < alpha:
-                            # 随机选择变异方向（增大或减小）
-                            if random.random() < 0.5:
-                                # 增大因子（但幅度随迭代减小）
-                                arr[i, j] *= (1 + 0.5 * decay_factor)
-                            else:
-                                # 减小因子
-                                arr[i, j] *= (1 - 0.3 * decay_factor)
-            else:
-                for i in range(len(arr)):
-                    if random.random() < alpha:
-                        if random.random() < 0.5:
-                            arr[i] *= (1 + 0.5 * decay_factor)
-                        else:
-                            arr[i] *= (1 - 0.3 * decay_factor)
-            
-            return arr
- 
-        def gaussian_mutation(arr, row, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
-            """
-            带自适应步长的高斯变异算子
-            
-            参数:
-            - arr: 待变异的参数矩阵 (numpy array)
-            - alpha: 变异概率 (0.0-1.0)
-            - generation: 当前迭代代数
-            - max_generations: 总迭代代数
-            - sigma_base: 基础标准差，控制变异步长
-            
-            返回:
-            - 变异后的参数矩阵
-            """
-            # 自适应标准差：随迭代进行减小步长（早期探索，后期开发）
-            decay_factor = 1.0 - (generation / max_generations) * 0.7
-            sigma = sigma_base * decay_factor
-            
-            if arr.ndim == 2:
-                # 只遍历前row行（使用min确保不越界）
-                for i in range(min(row, arr.shape[0])):
-                    for j in range(arr.shape[1]):
-                        if random.random() < alpha:
-                            arr[i, j] += np.random.normal(0, sigma)
-                            # 可选：限制参数范围
-                            # arr[i, j] = np.clip(arr[i, j], 0, 1)
-            else:  # 一维数组处理
-                for i in range(len(arr)):
-                    if random.random() < alpha:
-                        arr[i] += np.random.normal(0, sigma)
-                        # arr[i] = np.clip(arr[i], 0, 1)
-            
-            return arr
-
-        
-        def shuffle_row(arr, row, alpha=0.5):
-            total_rows = arr.shape[0]
-        
-            # 打乱前row行（如果存在）
-            if row > 1 and row <= total_rows:
-                front_indices = list(range(row))
-                random.shuffle(front_indices)
-                arr[:row] = arr[front_indices]
-            
-            # 打乱后面的行（如果存在且行数>1）
-            remaining_rows = total_rows - row
-            if remaining_rows > 1 and row < total_rows:
-                back_start = row
-                back_indices = list(range(back_start, total_rows))
-                random.shuffle(back_indices)
-                arr[back_start:total_rows] = arr[back_indices]
-        
-        def shuffle_col(arr, alpha=0.5):
-            if random.random() < alpha:
-                # print(arr.shape)
-                cols = list(range(arr.shape[1]))
-                # print(cols)
-                random.shuffle(cols)
-                arr[:] = arr[:, cols]
-
-        def adaptive_crossover_rate(generation, max_generations, initial_rate=0.8):
-            """自适应交叉率：随迭代减少探索"""
-            progress = generation / max_generations
-            return initial_rate * (1 - progress * 0.4)  # 从0.8降至0.4
-
-        def adaptive_mutation_rate(generation, max_generations, initial_rate=0.5):
-            """自适应变异率：随迭代增加开发"""
-            progress = generation / max_generations
-            return initial_rate * (0.5 + progress * 0.5)  # 从0.5降至0.25
-
-
-
-        def calculate_population_diversity(pop):
-            """计算种群多样性（基于欧氏距离）"""
-            if len(pop) <= 1:
-                return 0
-            diversity = 0
-            for i in range(len(pop)):
-                for j in range(i+1, len(pop)):
-                    diversity += np.linalg.norm(pop[i].flatten() - pop[j].flatten())
-            return diversity / (len(pop) * (len(pop) - 1) / 2)
-        
-        def check_convergence(best_reward_list, window_size=10, threshold=1e-3):
-            """改进的收敛检测"""
-            if len(best_reward_list) < window_size * 2:
-                return False
-            recent = np.array([r[0] for r in best_reward_list[-window_size:]])
-            older = np.array([r[0] for r in best_reward_list[-window_size*2:-window_size]])
-            improvement = (np.mean(recent) - np.mean(older)) / (abs(np.mean(older)) + 1e-10)
-            return improvement < threshold
-        
-
         num_generations = num_generations
         num_population = num_population
         num_elite = int(num_population * elite_ratio)
         pool = Pool(min(num_population + num_elite, cpu_count()))
-        best_reward_list = []
+
         best_reward = [-float("Inf") for _ in range( len(self.fitness_obj))]
         best_sol = None
+        best_values = []
 
-        population = self.create_genome_for_parameters(num_population)
+      
+        if self.accl_name == 'Simba':
+            population = self.create_genome_for_parameters3(num_population)
+        elif self.accl_name == 'Gemmini':
+            population = self.create_genome_for_gemmini(num_population)
+        elif self.accl_name == 'NEW':
+            population = self.create_genome_for_NEW(num_population)
         # mapping, _ = self.generate_mapping(self.dimension, population[0])
         # exit()
         fitness = np.ones((num_population, len(self.fitness_obj)), float)
         num_parents = num_population
+        row = len(population[0].buffer_hierarchy)
+        col = 8
+        best_temporal_tile_weights = [np.random.uniform(low=1.0, high=100.0, size=(row, col)) for _ in range(len(self.problems_list))]
+        best_spatial_tile_weights = [np.random.uniform(low=1.0, high=100.0, size=(row, col)) for _ in range(len(self.problems_list))]
+        best_tile_weights_scores = [-float('inf') for _ in range(len(self.problems_list))]
+        best_buffer_temporal_weights = [np.random.randint(10, 100, size=row).astype(float) for _ in range(len(self.problems_list))]
+        best_buffer_spatial_weights = [np.random.randint(10, 100, size=row).astype(float) for _ in range(len(self.problems_list))]
+        no_mutation = [False for _ in range(len(self.problems_list))]
         for g in range(num_generations):
+            start_time = time.time()
             # alpha = adaptive_parameters(g, num_generations)
             
-            # 计算自适应参数
-            diversity = calculate_population_diversity(population)
-            crossover_alpha = adaptive_crossover_rate(g, num_generations)
-            mutation_alpha = adaptive_mutation_rate(g, num_generations)
-
+        
             finetine_iter = 1 if g < num_generations // 2 else num_finetune
             for f in range(finetine_iter):
                 gen_best = -float("Inf")
@@ -693,36 +1029,53 @@ class MappingExplorer:
                 if num_parents < 1:  # restart
                     print("restart!")
                     return 
+                
                 population, fitness, parents = self.select_parents(population, fitness, num_parents, num_population,
                                                                   stage_idx, first_stage_value=prev_stage_value)
+
                 elite = copy.deepcopy(parents[:num_elite])
                 elite_fitness = copy.deepcopy(fitness[:(len(elite))])
 
-                crossover_tile(parents, population, row, alpha=crossover_alpha)
-             
+                
+                crossover(parents, population, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5)
+
                 # 变异
                 for pop in population[num_elite:]:
                     # 选择一种主要变异策略
-                    if random.random() < 0.7:  # 70%概率使用高斯变异
-                        gaussian_mutation(pop, row, alpha=mutation_alpha, generation=g, max_generations=num_generations)
-                    else:  # 30%概率使用因子变异
-                        mutate_factor(pop, row, alpha=mutation_alpha, generation=g, max_generations=num_generations)
-                    shuffle_order(pop, alpha=0.1)
-                    # reverse_sign(pop, alpha=0.2)
-                    if self.para_dim == 2:
-                        shuffle_row(pop, row, alpha=0.1)
-                        shuffle_col(pop, alpha=0.1)
+                    pop.mutation(best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5, generation=g, max_generations=num_generations)
+                
 
-                # 1. 更新种群（参数矩阵）
-                population = elite + population[num_elite:]  # 合并精英和变异后的个体
-
-                # 2. 更新适应度数组
-                # 假设elite_fitness的长度是num_elite，population的长度是num_population
-                # 需要确保新的fitness数组与population长度一致
+                # 1. 更新种群（参数矩阵）thread_fun_pation长度一致
                 fitness = np.zeros((num_population, len(self.fitness_obj)))
                 fitness[:num_elite] = elite_fitness  # 前num_elite个位置填充精英的适应度
 
-                reward_list = pool.map(self.thread_fun_p, population)
+                results = pool.map(self.thread_fun_p, population)
+                reward_list = [res[0] for res in results]
+                tile_value_list = [res[1] for res in results]
+                mapping_list = [res[2] for res in results]
+                for idx_prob in range(len(self.problems_list)):
+                    current_tile_weights_scores = -float('inf')
+                    current_temporal_tile_weights = None
+                    current_spatial_tile_weights = None
+                    current_buffer_temporal_weights = None
+                    current_buffer_spatial_weights = None
+                    for idx_pop in range(len(population)):
+                        if tile_value_list[idx_pop][idx_prob][0] > current_tile_weights_scores:
+                            current_tile_weights_scores = tile_value_list[idx_pop][idx_prob][0]
+                            current_temporal_tile_weights = population[idx_pop].temporal_tile_weights[idx_prob]
+                            current_spatial_tile_weights = population[idx_pop].spatial_tile_weights[idx_prob]
+                            current_buffer_temporal_weights = population[idx_pop].buffer_temporal_weights
+                            current_buffer_spatial_weights = population[idx_pop].buffer_spatial_weights
+
+                    if current_tile_weights_scores > best_tile_weights_scores[idx_prob]:
+                        best_tile_weights_scores[idx_prob] = current_tile_weights_scores
+                        best_temporal_tile_weights[idx_prob] = current_temporal_tile_weights
+                        best_spatial_tile_weights[idx_prob] = current_spatial_tile_weights
+                        best_buffer_temporal_weights[idx_prob] = current_buffer_temporal_weights
+                        best_buffer_spatial_weights[idx_prob] = current_buffer_spatial_weights
+
+                
+                print(best_tile_weights_scores)
                 for i in range(len(population)):
                     reward =reward_list[i]
                     if reward is None or any(np.array(reward) >= 0):
@@ -741,73 +1094,100 @@ class MappingExplorer:
                 if judging_best_reward < gen_best:
                     best_reward = copy.deepcopy(fitness[gen_best_idx])
                     best_sol = copy.deepcopy(population[gen_best_idx])
+                    best_values = copy.deepcopy(tile_value_list[gen_best_idx])
+                print(best_values)
+                print(no_mutation)
 
                 num_parents = int(num_population * parents_ratio)
                 num_parents = min(num_parents, len(population) - count_non_valid)
                 parents_ratio *= ratio_decay
-                best_reward_list.append(best_reward)
-                chkpt = {
-                    "best_reward": best_reward,
-                    "best_reward_list": best_reward_list,
-                    "best_sol": best_sol,
-                    "num_population": num_population,
-                    "num_generations": num_generations,
-                    "fitness_use": self.fitness_obj
-                }
+
+                # if g > 20:
+                #     average = np.mean(best_values)
+                #     for i in range(len(self.problems_list)):
+                #         relative_error = abs(best_values[i][0] - best_tile_weights_scores[i]) / max(abs(best_tile_weights_scores[i]), 1e-8)
+                #         if relative_error < 0.2 and average > best_values[i][0]:
+                #             no_mutation[i] = True
                 
                 print( "[Stage {}]Gen {}:  1st stage Reward: {}, Best reward: {}".format(stage_idx + 1, (g + 1), np.abs(prev_stage_value), np.abs(best_reward)))
-                # 检查收敛
-                if check_convergence(best_reward_list):
-                    print("Converged at generation", g)
-                    break
-            
-            # # 在迭代后期（如后半程）应用模拟退火
-            # if g >= num_generations // 2:
-            #     # 对当前最优解进行模拟退火优化
-            #     if best_sol is not None:
-            #         print(f"Generation {g}: 应用模拟退火优化最优解")
-            #         best_sol = simulated_annealing(
-            #             best_sol,
-            #             evaluate_solution,
-            #             para_dim=self.para_dim,
-            #             max_iter=50,
-            #             initial_temp=50.0,
-            #             cooling_rate=0.98
-            #         )
-            #         # 重新评估优化后的解
-            #         best_reward = [evaluate_solution(best_sol)] + [-float("Inf")] * (len(self.fitness_obj)-1)
-            #         best_reward[stage_idx] = evaluate_solution(best_sol)
-            
-            # 每5代检查并恢复多样性
-            if g % 5 == 0 and diversity < 0.2:
-                # print(f"Generation {g}: 种群多样性低，注入新个体")
-                replace_count = max(5, int(num_population * 0.1))
-                for i in range(replace_count):
-                    worst_idx = np.argmin(fitness[:, stage_idx])
-                    population[worst_idx] = self.create_genome_for_parameters(1)[0]
-                    fitness[worst_idx] = [float("-Inf")] * len(best_reward)
-
+       
+   
+            elapsed_time = time.time() - start_time
+            print("Generation {} 耗时: {:.3f}秒".format(g, elapsed_time))
         pool.close()
 
-        remainders = {}
-        outermost_idx = {}
-        # print(best_sol)
-        best_map, _ = self.generate_mapping(self.dimension, best_sol)
-        best_map = Mapping(best_map)
-        for d in best_map.factor_dict.keys():
-            T = self.dimension_dict[d]
-            F = best_map.factor_dict[d]
-            remainders[d], outermost_idx[d] = utils.find_remainders(F[::-1], T)
-        best_mapping = utils.generate_mapping(best_map.factor_dict, best_map.permutation_list, best_map.target_list, best_map.type_list, best_map.bypass_list, remainders, outermost_idx)
-        map_path = f'{self.report_dir}/map.yaml'
-        utils.store_yaml(map_path, best_mapping)
-        prob_path = f'{self.report_dir}/problem.yaml'
-        utils.store_yaml(prob_path, self.problem.problem)
-        arch_path = f'{self.report_dir}/arch.yaml'
-        utils.store_yaml(arch_path, self.accelerator.arch_dict)
-
-        # 如果要使用cwd, 文件路径要么是绝对路径要么是cwd的相对路径
-        utils.run_timeloop('arch.yaml', 'problem.yaml', 'map.yaml', cwd=self.report_dir)
-
-        return best_map        
-
+        mapping_list, _, arch = self.generate_mapping_and_config_for_all_DNN(self.tensor_dimensions_list, best_sol)
+        
+        # 原始指标存储（用于计算聚合值）
+        raw_metrics = {
+            "cycles": [], "energy": [], "utilization": [], 
+            "GFLOPs": [], "EDP": []  # 保留各层EDP仅作备份
+        }
+        for i in range(len(mapping_list)):
+            mapping = Mapping(mapping_list[i])
+            remainders = {}
+            outermost_idx = {}
+            problem = self.problems_list[i]
+            for d in mapping.factor_dict.keys():
+                T = problem['problem']['instance'][d]
+                F = mapping.factor_dict[d]
+                remainders[d], outermost_idx[d] = utils.find_remainders2(F[::-1], T)
+            # 需要根据探索的结果修改permutation_list，type_list， target_list和bypass_list
+            temp_mapping = utils.generate_mapping(mapping.factor_dict, mapping.permutation_list, mapping.target_list, mapping.type_list, mapping.bypass_list, remainders, outermost_idx)
+            report_dir = f'{self.report_dir}/layer-{i}'
+            if not os.path.exists(report_dir):
+                os.makedirs(report_dir)
+            utils.store_yaml(f'{report_dir}/map.yaml', temp_mapping)
+            utils.store_yaml(f'{report_dir}/problem.yaml', problem)
+            utils.store_yaml(f'{report_dir}/arch.yaml', arch)
+            utils.run_timeloop('arch.yaml', 'problem.yaml', 'map.yaml', cwd=report_dir)
+            output_stats_path = os.path.join(report_dir, 'timeloop-model.stats.txt')
+            # 解析输出并记录原始指标（核心修改：先存原始值，再算奖励）
+            self.observation = utils.parse_timeloop_output(output_stats_path)
+            if self.observation is not None:
+                # 记录当前层的原始指标（未取负/未加工）
+                for metric in raw_metrics.keys():
+                    raw_metrics[metric].append(self.observation.get(metric, 0.0))
+                # 生成当前层的奖励值（仅用于记录，最终奖励从原始值聚合计算）
+                values = self.judge()
+        # -------------- 核心：按合理逻辑计算聚合指标 --------------
+        rewards = []
+        # 1. 先计算总cycles和总energy（基础指标）
+        total_cycles = sum(raw_metrics["cycles"])
+        total_energy = sum(raw_metrics["energy"])
+        # 2. 遍历fitness_obj，按指标类型计算聚合值
+        fitness_obj = self.fitness_obj
+        for term in fitness_obj:
+            if term == "cycles":
+                # 总周期：直接累加
+                rewards.append(-total_cycles)  # 负号：周期越少奖励越高
+            elif term == "energy":
+                # 总能耗：直接累加
+                rewards.append(-total_energy)  # 负号：能耗越少奖励越高
+            elif term == "EDP":
+                # 总EDP：总周期 × 总能耗
+                total_edp = total_cycles * total_energy * 0.000001
+                rewards.append(-total_edp)  # 负号：EDP越小奖励越高
+            elif term == "utilization":
+                # 利用率：有效算力加权平均（权重=各层cycles占比）
+                if total_cycles == 0:
+                    avg_util = 0.0
+                else:
+                    # 加权平均：(util1×cycles1 + util2×cycles2 + ...) / 总cycles
+                    weighted_util = sum(u * c for u, c in zip(raw_metrics["utilization"], raw_metrics["cycles"]))
+                    avg_util = weighted_util / total_cycles
+                rewards.append(avg_util)  # 正号：利用率越高奖励越高
+            elif term == "GFLOPs":
+                # GFLOPs：总算力 / 总时间（这里用总cycles近似时间）
+                if total_cycles == 0:
+                    total_gflops = 0.0
+                else:
+                    # 总算力=各层GFLOPs×各层cycles（因为GFLOPs是“每秒算力”，乘时间=总算力）
+                    total_compute = sum(g * c for g, c in zip(raw_metrics["GFLOPs"], raw_metrics["cycles"]))
+                    total_gflops = total_compute / total_cycles
+                rewards.append(total_gflops)  # 正号：算力越高奖励越高
+            else:
+                raise NameError(f'Undefined fitness type: {term}')
+        print('聚合的结果', total_cycles, total_energy,total_edp)
+        print(raw_metrics)
+        return total_cycles, total_energy         
