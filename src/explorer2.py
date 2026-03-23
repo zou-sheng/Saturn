@@ -16,6 +16,7 @@ import numpy as np
 from collections import deque
 import time
 import cvxpy as cp
+from sklearn.cluster import KMeans
 # from skopt import gp_minimize
 # from skopt.space import Integer
 # from skopt.utils import use_named_args
@@ -334,7 +335,7 @@ class HardwareConfig:
 
 
 class MappingExplorer:
-    def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, expanded_scope, weight_num, expanded_dict=None, parameter_dimension=2, weight_matrix=None, solver='lp', all_DNN=False):
+    def __init__(self, operator_instance, accelerator_dir, accelerator, mapper, type, version, report_dir, optim_obj, expanded_scope, cluster_num, expanded_dict=None, parameter_dimension=2, weight_matrix=None, solver='lp', all_DNN=False):
         self.accl_name = accelerator
 
         if optim_obj == 'latency':
@@ -359,7 +360,7 @@ class MappingExplorer:
             self.operator_instance = operator_instance
             self.problems_list = None  # 明确初始化
 
-        self.weight_num = weight_num
+        self.cluster_num = cluster_num
         
         self.report_dir = report_dir 
         self.expanded_scope = expanded_scope
@@ -438,6 +439,85 @@ class MappingExplorer:
         # 针对多层DNN的中间变量
         self.buffer_temporal_list = None
         self.buffer_spatial_list = None
+        
+        self.cluster_labels, self.n_clusters = self.cluster_layers(self.cluster_num)
+        
+
+    def cluster_layers(self, n_clusters=4):
+
+        """
+
+        根据层的维度特征进行聚类
+
+        返回: 
+
+        1. cluster_labels: 每一层所属的类别ID (列表，长度=layer_num)
+
+        2. n_clusters: 实际聚类数
+
+        """
+
+        if not self.all_DNN or not self.problems_list:
+
+            return None, 0
+
+        
+
+        # 提取特征：[R, S, C, K, P, Q, N] (对数尺度，避免大数主导)
+
+        features = []
+
+        for prob in self.problems_list:
+
+            inst = prob['problem']['instance']
+
+            # 提取关键维度，取log2防止数值差异过大
+
+            f = [
+
+                np.log2(max(inst.get('R', 1), 1)),
+
+                np.log2(max(inst.get('S', 1), 1)),
+
+                np.log2(max(inst.get('C', 1), 1)),
+
+                np.log2(max(inst.get('K', 1), 1)),
+
+                np.log2(max(inst.get('P', 1), 1)),
+
+                np.log2(max(inst.get('Q', 1), 1)),
+
+                np.log2(max(inst.get('N', 1), 1)),
+
+            ]
+
+            features.append(f)
+
+        
+
+        features = np.array(features)
+
+        
+
+        # 简单处理：如果层数少于聚类数，则每层一类
+
+        layer_num = len(features)
+
+        if layer_num <= n_clusters:
+
+            return list(range(layer_num)), layer_num
+
+        
+
+        # 运行 K-Means
+
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+
+        labels = kmeans.fit_predict(features)
+
+        
+
+        return labels.tolist(), n_clusters
 
     def shuffle_factor_order(self, mapping, alpha=0.5):
         if random.random() < alpha:
@@ -1094,16 +1174,16 @@ class MappingExplorer:
         
         # 定义目标函数：矩阵元素的加权和
         objective = 0
-        num = len(p.spatial_tile_weights)
         for k in range(len(dimension_list)):
+            cluster_id = self.cluster_labels[k]
             for r in range(rows):
                 for c in range(cols):
-                    objective += spatial_tiles[k][r][c] * p.spatial_tile_weights[k%num][r][c]
+                    objective += spatial_tiles[k][r][c] * p.spatial_tile_weights[cluster_id][r][c]
 
         for k in range(len(dimension_list)):
             for r in range(rows):
                 for c in range(cols):
-                    objective += temporal_tiles[k][r][c] * p.temporal_tile_weights[k%num][r][c]
+                    objective += temporal_tiles[k][r][c] * p.temporal_tile_weights[cluster_id][r][c]
 
         # 不包含DRAM，所以是rows-1行
         for i in range(rows-1):
@@ -1815,7 +1895,7 @@ class MappingExplorer:
         data = compute_last_row(data)
         return data, config
 
-    # 硬件优先，会导致配置浪费
+    # 固定映射，算配置
     def _integerize_with_staged_optimization_with_config_all_DNN(self, solutions, p):
         
         # 计算最后一行
@@ -1992,7 +2072,7 @@ class MappingExplorer:
             # 确保上界不超过原始值
             return min(best_valid, original_value)
 
-    def _integerize_with_staged_optimization_for_DNN(self, solution, p):
+    def _integerize_with_staged_optimization_for_DNN(self, spatial_tiles, temporal_tiles, spatial_capacity_list, buffer_capacity_list, p, k):
         def calculate_remaining_capacity(data, fixed_rows):
             """计算存储层次剩余容量"""
             result = {}
@@ -2005,9 +2085,31 @@ class MappingExplorer:
                 used_capacity = 0
                 for tensor in self.buffer_tensor_dict[buffer_name]:
                     tensor_capacity = 1
-                    for l in all_involved_rows:
-                        for dim in self.tensor_dimensions[tensor]:
-                            tensor_capacity *= data[l][dim] if l in fixed_rows else 1
+                    if tensor == 'Inputs':
+                            R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
+                            for l in range(r+1):
+                                R *= spatial_tiles_list[l][0]
+                                S *= spatial_tiles_list[l][1]
+                                P *= spatial_tiles_list[l][2]
+                                Q *= spatial_tiles_list[l][3]
+                                C *= spatial_tiles_list[l][4]
+                                K *= spatial_tiles_list[l][5]
+                                H *= spatial_tiles_list[l][6]
+                                N *= spatial_tiles_list[l][7]
+                                R *= temporal_tiles_list[l][0]
+                                S *= temporal_tiles_list[l][1]
+                                P *= temporal_tiles_list[l][2]
+                                Q *= temporal_tiles_list[l][3]
+                                C *= temporal_tiles_list[l][4]
+                                K *= temporal_tiles_list[l][5]
+                                H *= temporal_tiles_list[l][6]
+                                N *= temporal_tiles_list[l][7]
+                            tensor_capacity = N*((P-1)*self.problems_list[k]['problem']['instance']['Wstride']+1+self.problems_list[k]['problem']['instance']['Wdilation']*(R-1))*((Q-1)*self.problems_list[k]['problem']['instance']['Hstride']+1+self.problems_list[k]['problem']['instance']['Hdilation']*(S-1))*C*H
+                          
+                    else:
+                        for l in all_involved_rows:
+                            for dim in self.tensor_dimensions[tensor]:
+                                tensor_capacity *= data[l][dim] if l in fixed_rows else 1
                     used_capacity += tensor_capacity
                 result[buffer_name] = used_capacity
             return result
@@ -2050,7 +2152,7 @@ class MappingExplorer:
             # 确保上界不超过原始值
             return min(best_valid, original_value)
 
-        def maximize_row_with_constraint(data, row, constraint_func, target, fixed_rows, p_row):
+        def maximize_row_with_spatial_constraint(data, row, constraint_func, target, fixed_rows, p_row):
             """带约束的行最大化（DFS+上界优化）"""
             fixed_positions = np.where(data[row] == 1)[0]
             columns_to_process = [j for j in range(len(data[row])) if j not in fixed_positions]
@@ -2092,124 +2194,86 @@ class MappingExplorer:
             bfs(data.copy(), 0, set())
             return best_data
         
-        # 固定行优化流程
-        fixed_rows = []
-        data = np.ceil(solution).astype(int)
-        
+        sptial_fixed_rows = []
+        cluster_id = self.cluster_labels[k]
+        data = (spatial_tiles, temporal_tiles)
         # 空间层次优化
-        for spatial_name in self.spatial_level:
-            sp_level = self.spatial_level[spatial_name]
-            spatial_capacity = self.spatial_size_list[spatial_name]
-            p_row = p[sp_level]  # 获取当前行的权重
+        for i in range(len(spatial_tiles)):
+            p_row = p.spatial_tile_weights[cluster_id]
             data = maximize_row_with_constraint(
-                data, sp_level, 
-                lambda x: np.prod(x[sp_level]), 
-                spatial_capacity, 
-                fixed_rows,
-                p_row
+                data, i, 
+                lambda x: np.prod(x[i]), 
+                spatial_capacity_list[i], 
+                sptial_fixed_rows,
+                p_row,
+                "spatial"
             )
-            fixed_rows.append(sp_level)
+            sptial_fixed_rows.append(i)
         
+        temporal_fixed_rows = []
         # 存储层次优化
-        def create_buffer_constraint(buffer_name):
-            return lambda x: sum(
-                np.prod(x[self.temporal_level[buffer_name]][self.tensor_dimensions[tensor]]) 
-                for tensor in self.buffer_tensor_dict[buffer_name]
-            )
+        def create_buffer_constraint(buffer_level):
+            tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[buffer_level]]
+            for tensor in tensors_list:
+                tensor_capacity = 1
+                if tensor == 'Inputs':
+                    R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
+                    for l in range(buffer_level+1):
+                        R *= spatial_tiles[l][0]
+                        S *= spatial_tiles[l][1]
+                        P *= spatial_tiles[l][2]
+                        Q *= spatial_tiles[l][3]
+                        C *= spatial_tiles[l][4]
+                        K *= spatial_tiles[l][5]
+                        H *= spatial_tiles[l][6]
+                        N *= spatial_tiles[l][7]
+                        R *= temporal_tiles[l][0]
+                        S *= temporal_tiles[l][1]
+                        P *= temporal_tiles[l][2]
+                        Q *= temporal_tiles[l][3]
+                        C *= temporal_tiles[l][4]
+                        K *= temporal_tiles[l][5]
+                        H *= temporal_tiles[l][6]
+                        N *= temporal_tiles[l][7]
+                    tensor_capacity = N*((P-1)*self.problems_list[k]['problem']['instance']['Wstride']+1+self.problems_list[k]['problem']['instance']['Wdilation']*(R-1))*((Q-1)*self.problems_list[k]['problem']['instance']['Hstride']+1+self.problems_list[k]['problem']['instance']['Hdilation']*(S-1))*C*H
+                    
+                else:
+                    for l in range(buffer_level+1):
+                        for dim in self.tensor_dimensions[tensor]:
+                            tensor_capacity *= spatial_tiles[l][dim]
+                            tensor_capacity *= temporal_tiles[l][dim]
+            return tensor_capacity
                 
-        for buffer_key in sorted(self.buffer_name_list.keys()):
-            buffer_name = self.buffer_name_list[buffer_key]
-            if buffer_name == 'DRAM':
-                continue
-            buffer_level = self.temporal_level[buffer_name]
-            buffer_capacity = self.buffer_size_list[buffer_key]
-            p_row = p[buffer_level]  # 获取当前行的权重
-            constraint_func = create_buffer_constraint(buffer_name)
+        for i in range(len(temporal_tiles)-1): # 排除DRAM
+            cluster_id = self.cluster_labels[k]
+            buffer_capacity = buffer_capacity_list[i]
+            p_row = p.temporal_tile_weights[cluster_id]  # 获取当前行的权重
+            constraint_func = create_buffer_constraint(i)
             data = maximize_row_with_constraint(
-                data, buffer_level, 
+                data, i, 
                 constraint_func, 
                 buffer_capacity, 
-                fixed_rows,
-                p_row
+                temporal_fixed_rows,
+                p_row,
+                "temporal"
             )
-            fixed_rows.append(buffer_level)
+            temporal_fixed_rows.append(i)
         
         # 计算最后一行
-        def compute_last_row(data):
-            product = np.prod(data[:-1], axis=0, dtype=np.float64)
-            last_row = np.ceil(np.array(self.dimension) / product).astype(int)
-            return np.vstack([data[:-1], np.maximum(last_row, 1)])
         
-        return compute_last_row(data)
+        def compute_last_row(dimension, spatial_tiles, temporal_tiles):
+
+            spatial_prod = np.prod(spatial_tiles, axis=0, dtype=np.float64)
+            temporal_prod = np.prod(temporal_tiles[:-1], axis=0, dtype=np.float64)
+            last_row = np.ceil(np.array(dimension) / (spatial_prod*temporal_prod)).astype(int)
+
+            return last_row
+        last_row = compute_last_row(self.dimension[k], spatial_tiles, temporal_tiles)
+        temporal_tiles = np.vstack((temporal_tiles[:-1], last_row))
+        return (spatial_tiles, temporal_tiles)
 
     # 固定硬件，调mapping
-    def _integerize_with_staged_optimization_with_config_all_DNN2(self, solutions, p, m):
-        
-        
-        # 计算第m大的硬件开销
-        def mth_hardware_config(spatial_tiles_list, temporal_tiles_list, m):
-            """
-            计算多个矩阵对应的最小硬件配置（每个约束维度取所有矩阵的最小值）
-            
-            参数:
-                data_list: 包含多个矩阵的列表（每个元素是一个矩阵，对应原data）
-            返回:
-                最小硬件配置列表（每个元素对应一个约束的最小值）
-            """
-            # 先收集每个矩阵的硬件配置
-            all_configs = []
-            for k in range(len(spatial_tiles_list)):
-
-                spatial_config = []
-                buffer_config = []
-                # 1. 并行容量约束
-                for r in range(len(p.buffer_hierarchy)):
-                    spatial_capacity = np.prod(spatial_tiles_list[k][r])
-                    spatial_config.append(spatial_capacity)
-                # 2. 除DRAM外的存储层次容量约束
-                # 去掉DRAM
-                for r in range(len(p.buffer_hierarchy)-1):
-                    buffer_capacity = 0
-                    tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[r]]
-                    for tensor in tensors_list:
-                        tensor_capacity = 1
-                        if tensor == 'Inputs':
-                            R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
-                            for l in range(r+1):
-                                R *= spatial_tiles_list[k][l][0]
-                                S *= spatial_tiles_list[k][l][1]
-                                P *= spatial_tiles_list[k][l][2]
-                                Q *= spatial_tiles_list[k][l][3]
-                                C *= spatial_tiles_list[k][l][4]
-                                K *= spatial_tiles_list[k][l][5]
-                                H *= spatial_tiles_list[k][l][6]
-                                N *= spatial_tiles_list[k][l][7]
-                                R *= temporal_tiles_list[k][l][0]
-                                S *= temporal_tiles_list[k][l][1]
-                                P *= temporal_tiles_list[k][l][2]
-                                Q *= temporal_tiles_list[k][l][3]
-                                C *= temporal_tiles_list[k][l][4]
-                                K *= temporal_tiles_list[k][l][5]
-                                H *= temporal_tiles_list[k][l][6]
-                                N *= temporal_tiles_list[k][l][7]
-                            tensor_capacity = N*((P-1)*self.problems_list[k]['problem']['instance']['Wstride']+1+self.problems_list[k]['problem']['instance']['Wdilation']*(R-1))*((Q-1)*self.problems_list[k]['problem']['instance']['Hstride']+1+self.problems_list[k]['problem']['instance']['Hdilation']*(S-1))*C*H
-                          
-                        else:
-                            for l in range(r+1):
-                                for dim in self.tensor_dimensions[tensor]:
-                                    tensor_capacity *= spatial_tiles_list[k][l][dim]
-                                    tensor_capacity *= temporal_tiles_list[k][l][dim]
-                        buffer_capacity += tensor_capacity
-                    buffer_config.append(buffer_capacity)
-                all_configs.append([spatial_config, buffer_config])
-            # 对每个约束维度取所有矩阵的最大值（即最小硬件配置）
-            spatial_cols = zip(*[cfg[0] for cfg in all_configs])  # 按列分组
-            buffer_cols = zip(*[cfg[1] for cfg in all_configs])
-            mth_spatial = [get_nth_largest(col, m) for col in spatial_cols]
-            mth_buffer = [get_nth_largest(col, m) for col in buffer_cols]
-            mth_config = [mth_spatial, mth_buffer]
-            return mth_config
-        
+    def _integerize_with_staged_optimization_with_config_all_DNN2(self, solutions, p):
         def safe_ceil(x, eps=1e-6):
             """安全向上取整，避免因浮点误差导致1.0000001被取为2"""
             # 先四舍五入到eps精度（如1e-6），消除微小误差
@@ -2222,18 +2286,7 @@ class MappingExplorer:
                 # 确实需要向上取整的情况（如1.1 → 2）
                 return int(np.ceil(x_rounded))
 
-        def get_nth_largest(values, n):
-            """
-            获取列表中第n大的值（保留重复值）
-            :param values: 目标数值列表
-            :param n: 要获取的排名（1-based，如n=1是最大值，n=2是第2大）
-            :return: 第n大的值
-            """
-            if n < 1 or n > len(values):
-                raise ValueError(f"n必须在1到{len(values)}之间")
-            # 降序排序后取第n-1个索引
-            sorted_values = sorted(values, reverse=True)
-            return sorted_values[n-1]
+        
 
         
         spatial_tiles_solution = solutions[0]
@@ -2244,7 +2297,7 @@ class MappingExplorer:
         
         spatial_tiles_list = []
         temporal_tiles_list = []
-        datas = []
+
         for i in range(len(solutions[0])):
             tile_matrix = np.array(temporal_tiles_solution[i])
             # 用vectorize实现批量处理（效率较高）
@@ -2273,14 +2326,12 @@ class MappingExplorer:
             spatial_capacity_int = safe_ceil_vec(tile_matrix).astype(int)
             spatial_capacity_list.append(spatial_capacity_int)
 
-        if m == 0:
-            config = [spatial_capacity_list, spatial_capacity_list[:-1]]
-        else:
-            config = mth_hardware_config(spatial_tiles_list, temporal_tiles_list, m)
+        
+        config = [spatial_capacity_list, buffer_capacity_list]
         
         new_data = []
         for i in range(len(solutions[0])):
-            new_data.append(self._integerize_with_staged_optimization_for_DNN())
+            new_data.append(self._integerize_with_staged_optimization_for_DNN(spatial_tiles_list[i], temporal_tiles_list[i], spatial_capacity_list, buffer_capacity_list, p, i))
         return new_data, config
 
 
@@ -2599,13 +2650,13 @@ class MappingExplorer:
         pop = []
         buffer_hierarchy = ['Registers', 'AccumulationBuffer', 'WeightBuffer', 'InputBuffer', 'GlobalBuffer', 'DRAM']
         tensor_in_buffer = {'Registers': ['Weights'], 'AccumulationBuffer': ['Outputs'], 'WeightBuffer': ['Weights'], 'InputBuffer': ['Inputs'], 'GlobalBuffer': ['Inputs','Outputs'], 'DRAM': ['Weights','Inputs','Outputs']}
-        layer_num = len(self.problems_list)
+        
         row = len(buffer_hierarchy)
         col = 8
         for i in range(num_population):
             temporal_tile_weights = []
             spatial_tile_weights = []
-            for n in range(layer_num): 
+            for n in range(self.cluster_num): 
                 temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
                 spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
             buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
@@ -2639,13 +2690,13 @@ class MappingExplorer:
         buffer_hierarchy = ['Registers', 'Accumulator', 'Scratchpad', 'DRAM']
         tensor_in_buffer = {'Registers': ['Weights'], 'Accumulator': ['Outputs'], 'Scratchpad': ['Inputs', 'Weights'], 'DRAM': ['Weights','Inputs','Outputs']}
         # tensor_in_buffer = {'Registers': ['Weights'], 'Accumulator': ['Weights'], 'Scratchpad': ['Weights', 'Inputs', 'Outputs'], 'DRAM': ['Weights','Inputs','Outputs']}
-        layer_num = len(self.problems_list)
+        
         row = len(buffer_hierarchy)
         col = 8
         for i in range(num_population):
             temporal_tile_weights = []
             spatial_tile_weights = []
-            for n in range(layer_num): 
+            for n in range(self.cluster_num): 
                 temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
                 spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
             buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
@@ -5219,6 +5270,7 @@ class MappingExplorer:
         best_sol = None
         best_values = []
 
+
       
         if self.accl_name == 'Simba':
             population = self.create_genome_for_parameters3(num_population)
@@ -5237,7 +5289,7 @@ class MappingExplorer:
         best_tile_weights_scores = [-float('inf') for _ in range(len(self.problems_list))]
         best_buffer_temporal_weights = [np.random.randint(10, 100, size=row).astype(float) for _ in range(len(self.problems_list))]
         best_buffer_spatial_weights = [np.random.randint(10, 100, size=row).astype(float) for _ in range(len(self.problems_list))]
-        no_mutation = [False for _ in range(len(self.problems_list))]
+        no_mutation = [False for _ in range(self.cluster_num)]
         for g in range(num_generations):
             start_time = time.time()
             # alpha = adaptive_parameters(g, num_generations)
@@ -5283,12 +5335,11 @@ class MappingExplorer:
                     current_buffer_temporal_weights = None
                     current_buffer_spatial_weights = None
                     for idx_pop in range(len(population)):
+                        cluster_id = self.cluster_labels[idx_prob]
                         if tile_value_list[idx_pop][idx_prob][0] > current_tile_weights_scores:
                             current_tile_weights_scores = tile_value_list[idx_pop][idx_prob][0]
-                            current_temporal_tile_weights = population[idx_pop].temporal_tile_weights[idx_prob%self.weight_num]
-                            current_spatial_tile_weights = population[idx_pop].spatial_tile_weights[idx_prob%self.weight_num]
-                            # current_temporal_tile_weights = population[idx_pop].temporal_tile_weights[idx_prob]
-                            # current_spatial_tile_weights = population[idx_pop].spatial_tile_weights[idx_prob]
+                            current_temporal_tile_weights = population[idx_pop].temporal_tile_weights[cluster_id]
+                            current_spatial_tile_weights = population[idx_pop].spatial_tile_weights[cluster_id]
                             current_buffer_temporal_weights = population[idx_pop].buffer_temporal_weights
                             current_buffer_spatial_weights = population[idx_pop].buffer_spatial_weights
 

@@ -29,7 +29,7 @@ def main():
     weight_matrix_config       = opt.weight_matrix_config
     solver                     = opt.solver
     all_DNN                    = opt.all_DNN
-    weight_num                 = opt.weight_num
+    cluster_num                 = opt.cluster_num
     all_workload               = opt.all_workload
     search_mode                = opt.search_mode
     
@@ -218,7 +218,7 @@ def main():
 
                     problems_list.append(problem)
         if search_mode == "UF":
-            ME = MappingExplorer(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, weight_num, solver=solver, all_DNN=all_DNN)
+            ME = MappingExplorer(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN)
             print(opt.population)
             chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
         elif search_mode == "HF":
@@ -338,7 +338,7 @@ if __name__ == '__main__':
     parser.add_argument('--weight_matrix_config', type=str, default=None)
     parser.add_argument('--solver', type=str, default='lp')
     parser.add_argument('--all_DNN', action='store_true', help='启用 all_DNN 模式（无需额外参数）')
-    parser.add_argument('--weight_num', type=int, default=10)
+    parser.add_argument('--cluster_num', type=int, default=5)
     parser.add_argument('--all_workload', action='store_true', help='启用 all_DNN 模式（无需额外参数）')
     parser.add_argument('--search_mode', type=str, default='UF', help='搜索策略：硬件优先（HF），映射优先（MF），以及默认统一搜索（UF）')
     main()
