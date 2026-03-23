@@ -2073,270 +2073,230 @@ class MappingExplorer:
             return min(best_valid, original_value)
 
     def _integerize_with_staged_optimization_for_DNN(self, spatial_tiles, temporal_tiles, spatial_capacity_list, buffer_capacity_list, p, k):
-        def calculate_remaining_capacity(data, fixed_rows):
-            """计算存储层次剩余容量"""
-            result = []
-            spatial_tiles = data[0]
-            temporal_tiles = data[1]
-            for i in range(len(buffer_capacity_list)): #最后一个是DRAM，不考虑
-                buffer_level = i
-                used_capacity = 0
-                tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[buffer_level]]
-                for tensor in tensors_list:
-                    tensor_capacity = 1
-                    if tensor == 'Inputs':
-                        R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
-                        for l in range(buffer_level+1):
-                            R *= spatial_tiles[l][0]
-                            S *= spatial_tiles[l][1]
-                            P *= spatial_tiles[l][2]
-                            Q *= spatial_tiles[l][3]
-                            C *= spatial_tiles[l][4]
-                            K *= spatial_tiles[l][5]
-                            H *= spatial_tiles[l][6]
-                            N *= spatial_tiles[l][7]
-                            R *= temporal_tiles[l][0] if l in fixed_rows else 1
-                            S *= temporal_tiles[l][1] if l in fixed_rows else 1
-                            P *= temporal_tiles[l][2] if l in fixed_rows else 1
-                            Q *= temporal_tiles[l][3] if l in fixed_rows else 1
-                            C *= temporal_tiles[l][4] if l in fixed_rows else 1
-                            K *= temporal_tiles[l][5] if l in fixed_rows else 1
-                            H *= temporal_tiles[l][6] if l in fixed_rows else 1
-                            N *= temporal_tiles[l][7] if l in fixed_rows else 1
-                        tensor_capacity = N*((P-1)*self.problems_list[k]['problem']['instance']['Wstride']+1+self.problems_list[k]['problem']['instance']['Wdilation']*(R-1))*((Q-1)*self.problems_list[k]['problem']['instance']['Hstride']+1+self.problems_list[k]['problem']['instance']['Hdilation']*(S-1))*C*H
+        def calculate_used_capacity_conservative(s_tiles, t_tiles, buffer_level, fixed_rows_set):
+            """
+            计算容量。
+            fixed_rows_set: 包含已确定值的行索引。
+            不在集合中的行，其 temporal 因子按 1 计算。
+            """
+            tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[buffer_level]]
+            total_capacity = 0
+            
+            for tensor in tensors_list:
+                tensor_capacity = 1
+                if tensor == 'Inputs':
+                    R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
+                    for l in range(buffer_level + 1):
+                        # Spatial (已优化)
+                        R *= s_tiles[l][0]; S *= s_tiles[l][1]; P *= s_tiles[l][2]; Q *= s_tiles[l][3]
+                        C *= s_tiles[l][4]; K *= s_tiles[l][5]; H *= s_tiles[l][6]; N *= s_tiles[l][7]
                         
-                    else:
-                        for l in range(buffer_level+1):
-                            for dim in self.tensor_dimensions[tensor]:
-                                tensor_capacity *= spatial_tiles[l][dim]
-                                tensor_capacity *= temporal_tiles[l][dim] if l in fixed_rows else 1
-                    used_capacity += tensor_capacity
-                    result.append(used_capacity)
-            return result
+                        # Temporal (保守策略)
+                        if l in fixed_rows_set:
+                            R *= t_tiles[l][0]; S *= t_tiles[l][1]; P *= t_tiles[l][2]; Q *= t_tiles[l][3]
+                            C *= t_tiles[l][4]; K *= t_tiles[l][5]; H *= t_tiles[l][6]; N *= t_tiles[l][7]
+                        # else: multiply by 1 (do nothing)
 
-        def remaining_capacity_constraint(data, fixed_rows):
-            """检查容量约束"""
-            capacities = calculate_remaining_capacity(data, fixed_rows)
-            for i in range(len(capacities)):
-                if capacities[i] > buffer_capacity_list[i]:
-                    return False
-            return True
-
-        def compute_column_upper_bound(data, row, col, fixed_rows, columns_processed, constraint_func, target):
-            """计算列的有效上界（不超过原始值，且未处理列设为1）"""
-            temporal_tiles = data[1]  # temporal_tiles
-            original_value = temporal_tiles[row][col]
-            test_data = data.copy()
-            
-            # 未处理的列设为1（包括当前列未处理时，但当前列会被单独设置）
-            for c in range(len(data[row])):
-                if c != col and c not in columns_processed:
-                    test_data[1][row][c] = 1
-            
-            # low, high = 1, math.floor(original_value * 1.1)
-            low, high = 1, original_value
-            best_valid = 1
-            
-            while low <= high:
-                mid = (low + high) // 2
-                test_data[1][row][col] = mid  # 设置当前列的值
-                
-                if constraint_func(test_data) <= target and remaining_capacity_constraint(test_data, fixed_rows + [row]):
-                    best_valid = mid
-                    low = mid + 1  # 尝试更大的值，但不超过original_value
+                    prob_inst = self.problems_list[k]['problem']['instance']
+                    tensor_capacity = N * (
+                        ((P - 1) * prob_inst['Wstride'] + 1 + prob_inst['Wdilation'] * (R - 1)) *
+                        ((Q - 1) * prob_inst['Hstride'] + 1 + prob_inst['Hdilation'] * (S - 1)) *
+                        C * H
+                    )
                 else:
-                    high = mid - 1
-            
-            # 确保上界不超过原始值
-            return min(best_valid, original_value)
-
-        def maximize_row_with_spatial_constraint(data, row, constraint_func, target, fixed_rows, p_row):
-            """带约束的行最大化（DFS+上界优化）"""
-            spatial_tiles = data[0]
-            temporal_tiles = data[1]
-            fixed_positions = np.where(spatial_tiles[row] == 1)[0]
-            columns_to_process = [j for j in range(len(spatial_tiles[row])) if j not in fixed_positions]
-            columns_to_process.sort(key=lambda j: spatial_tiles[row][j], reverse=True)
-            best_data = spatial_tiles.copy()
-            best_objective = 0
-            iterations = [0]
-
-            def bfs(current_data, col_index, columns_processed):
-                iterations[0] += 1
-                nonlocal best_data, best_objective
-                
-                if constraint_func(current_data) <= target:
-                    current_objective = np.sum(p_row * current_data[row])
-                    # current_objective = np.sum(p_row * np.log2(current_data[row]) + a * np.log2(current_data[row])**2)
-                    if current_objective > best_objective:
-                        best_data = current_data.copy()
-                        best_objective = current_objective
-                    return True
-
-                if col_index >= len(columns_to_process):
-                    return False
-
-                actual_col = columns_to_process[col_index]
-                columns_processed_current = columns_processed.union({actual_col})
-                
-                             
-                for value in range(current_data[row][actual_col], 0, -1):
-                    new_data = current_data.copy()
-                    new_data[row][actual_col] = value
-                    if bfs(new_data, col_index + 1, columns_processed_current):
-                        return True  # 找到最优解后提前终止
-            
-            bfs(spatial_tiles.copy(), 0, set())
-            return (best_data, temporal_tiles)
-        
-        def maximize_row_with_temporal_constraint(data, row, constraint_func, target, fixed_rows, p_row):
-            spatial_tiles = data[0]
-            temporal_tiles = data[1]
-            fixed_positions = np.where(temporal_tiles[row] == 1)[0]
-            columns_to_process = [j for j in range(len(temporal_tiles[row])) if j not in fixed_positions]   
-            columns_to_process.sort(key=lambda j: temporal_tiles[row][j], reverse=True)
-            best_temporal = temporal_tiles.copy()
-            best_objective = 0
-            iterations = [0]
-
-            def bfs(current_temporal, col_index, columns_processed):
-                iterations[0] += 1
-                nonlocal best_temporal, best_objective
-                current_data = (spatial_tiles, current_temporal)
-                if constraint_func(current_data) <= target and remaining_capacity_constraint(current_data, fixed_rows + [row]):
-                    current_objective = np.sum(p_row * current_temporal[row])
-                    # current_objective = np.sum(p_row * np.log2(current_temporal[row]) + a * np.log2(current_temporal[row])**2)
-                    if current_objective > best_objective:
-                        best_temporal = current_temporal.copy()
-                        best_objective = current_objective
-                    return True
-
-                if col_index >= len(columns_to_process):
-                    return False
-
-                actual_col = columns_to_process[col_index]
-                columns_processed_current = columns_processed.union({actual_col})
-                
-                upper_bound = compute_column_upper_bound(
-                    current_data, row, actual_col, fixed_rows, columns_processed, constraint_func, target
-                )
-                             
-                for value in range(upper_bound, 0, -1):
-                    new_temporal = current_temporal.copy()
-                    new_temporal[row][actual_col] = value
-                    if bfs((spatial_tiles, new_temporal), col_index + 1, columns_processed_current):
-                        return True  # 找到最优解后提前终止
-            bfs(temporal_tiles.copy(), 0, set())
-            return (spatial_tiles, best_temporal)
-
-
-        sptial_fixed_rows = []
-        cluster_id = self.cluster_labels[k]
-        data = (spatial_tiles, temporal_tiles)
-        # 空间层次优化
-        for i in range(len(spatial_tiles)):
-            p_row = p.spatial_tile_weights[cluster_id]
-            data = maximize_row_with_spatial_constraint(
-                data, i, 
-                lambda x: np.prod(x[i]), 
-                spatial_capacity_list[i], 
-                sptial_fixed_rows,
-                p_row,
-            )
-            sptial_fixed_rows.append(i)
-        
-        temporal_fixed_rows = []
-        # 存储层次优化
-        def make_buffer_constraint_func(buffer_level):
-            """
-            返回一个约束函数。
-            该函数接收一个元组 (spatial, temporal)，其中 spatial 是固定的，temporal 是变化的。
-            """
-            def constraint_func(data_tuple):
-                # 【关键】解包传入的元组
-                # data_tuple 格式: (spatial_matrix, temporal_matrix)
-                s_tiles = data_tuple[0]
-                t_tiles = data_tuple[1]
-                print("1111", s_tiles, "222222", t_tiles)
-                
-                tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[buffer_level]]
-                total_capacity = 0
-                
-                for tensor in tensors_list:
-                    tensor_capacity = 1
-                    if tensor == 'Inputs':
-                        R, S, P, Q, C, K, H, N = 1, 1, 1, 1, 1, 1, 1, 1
-                        # 累乘所有层级的 tile 大小
-                        for l in range(buffer_level + 1):
-                            # 使用传入的 s_tiles (可能是固定的，也可能是部分更新的，取决于调用上下文)
-                            # 注意：在 optimize temporal 时，s_tiles 通常是完整的固定值
-                            R *= s_tiles[l][0]
-                            S *= s_tiles[l][1]
-                            P *= s_tiles[l][2]
-                            Q *= s_tiles[l][3]
-                            C *= s_tiles[l][4]
-                            K *= s_tiles[l][5]
-                            H *= s_tiles[l][6]
-                            N *= s_tiles[l][7]
-                            
-                            # 使用传入的 t_tiles (这是 BFS 中正在变化的变量)
-                            R *= t_tiles[l][0]
-                            S *= t_tiles[l][1]
-                            P *= t_tiles[l][2]
-                            Q *= t_tiles[l][3]
-                            C *= t_tiles[l][4]
-                            K *= t_tiles[l][5]
-                            H *= t_tiles[l][6]
-                            N *= t_tiles[l][7]
-                        
-                        # 计算 Input Tensor 占用的 Buffer 容量
-                        # 请确保 self.problems_list[k] 在此作用域可见
-                        prob_inst = self.problems_list[k]['problem']['instance']
-                        tensor_capacity = N * (
-                            ((P - 1) * prob_inst['Wstride'] + 1 + prob_inst['Wdilation'] * (R - 1)) *
-                            ((Q - 1) * prob_inst['Hstride'] + 1 + prob_inst['Hdilation'] * (S - 1)) *
-                            C * H
-                        )
-                    else:
-                        # 其他 Tensor (Weights, Outputs 等)
-                        for l in range(buffer_level + 1):
-                            for dim in self.tensor_dimensions[tensor]:
-                                # 确保 dim 是有效的索引
-                                tensor_capacity *= s_tiles[l][dim]
+                    for l in range(buffer_level + 1):
+                        for dim in self.tensor_dimensions[tensor]:
+                            tensor_capacity *= s_tiles[l][dim]
+                            if l in fixed_rows_set:
                                 tensor_capacity *= t_tiles[l][dim]
-                    
-                    total_capacity += tensor_capacity
-                    
-                return total_capacity
+                total_capacity += tensor_capacity
+            return total_capacity
 
-            return constraint_func
-        print("222223333333333", data)
-        for i in range(len(temporal_tiles)-1): # 排除DRAM
-            cluster_id = self.cluster_labels[k]
-            buffer_capacity = buffer_capacity_list[i]
-            p_row = p.temporal_tile_weights[cluster_id]  # 获取当前行的权重
-            constraint_func = make_buffer_constraint_func(i)
-            data = maximize_row_with_temporal_constraint(
-                data, i, 
-                constraint_func, 
-                buffer_capacity, 
-                temporal_fixed_rows,
-                p_row,
+        def maximize_row_with_temporal_constraint(s_tiles, t_tiles, row, buffer_level, target, fixed_rows_list, p_row):
+            """
+            优化 Temporal 的某一行。
+            内部直接使用 calculate_used_capacity_conservative 进行剪枝。
+            """
+            fixed_positions = np.where(t_tiles[row] == 1)[0]
+            columns_to_process = [j for j in range(len(t_tiles[row])) if j not in fixed_positions]
+            columns_to_process.sort(key=lambda j: t_tiles[row][j], reverse=True)
+
+            
+            best_t = t_tiles.copy()
+            best_objective = 0
+
+            def bfs(current_t, col_index, columns_processed):
+                nonlocal best_t, best_objective
+
+
+                # 当前已固定的行集合：列表中的行 + 当前正在优化的行
+                current_fixed_set = set(fixed_rows_list) | {row}
+
+                
+                # 【核心修复】：计算保守容量
+                used_cap = calculate_used_capacity_conservative(s_tiles, current_t, buffer_level, current_fixed_set)
+
+                
+                # 同时检查其他层级是否超标（同样用保守策略）
+                all_ok = True
+                for lvl in range(len(buffer_capacity_list) - 1):
+                    if lvl == buffer_level: continue # 已检查
+                    cap = calculate_used_capacity_conservative(s_tiles, current_t, lvl, current_fixed_set)
+                    if cap > buffer_capacity_list[lvl]:
+                        all_ok = False
+                        break
+
+                
+                if used_cap <= target and all_ok:
+                    current_objective = np.sum(p_row * current_t[row])
+                    if current_objective > best_objective:
+                        best_t = current_t.copy()
+                        best_objective = current_objective
+                    return True
+
+                if col_index >= len(columns_to_process):
+                    return False
+
+                actual_col = columns_to_process[col_index]
+                columns_processed_current = columns_processed.union({actual_col})
+
+                
+                # 计算上界 (二分法)
+                original_value = int(current_t[row][actual_col])
+                low, high = 1, original_value
+                upper_bound = 1
+
+                
+                # 为了计算上界，我们需要模拟：当前列=mid, 其他未处理列=1, 后续行=1
+                # 这已经在 calculate_used_capacity_conservative 中通过 fixed_set 实现了
+                # 只要 fixed_set 不包含未处理列所在的行（当然行是固定的，列的处理在行内）
+                # 注意：calculate_used_capacity_conservative 是按行固定的。
+                # 对于当前行中“未处理的列”，我们需要额外处理：临时设为 1。
+
+                
+                while low <= high:
+                    mid = (low + high) // 2
+
+
+                    # 构造测试状态
+                    test_t = current_t.copy()
+                    test_t[row][actual_col] = mid
+
+                    
+                    # 将当前行中未处理的列设为 1
+                    for c in range(len(t_tiles[row])):
+                        if c != actual_col and c not in columns_processed:
+                            test_t[row][c] = 1
+
+
+                    # 检查容量 (此时 fixed_set 包含 row，所以 row 会使用 test_t 的值)
+                    # 而未固定的后续行会自动被视为 1
+                    test_cap = calculate_used_capacity_conservative(s_tiles, test_t, buffer_level, current_fixed_set)
+
+
+                    # 快速检查其他层级
+                    other_ok = True
+                    for lvl in range(len(buffer_capacity_list) - 1):
+                        if lvl == buffer_level: continue
+                        if calculate_used_capacity_conservative(s_tiles, test_t, lvl, current_fixed_set) > buffer_capacity_list[lvl]:
+                            other_ok = False
+                            break
+                    
+
+                    if test_cap <= target and other_ok:
+                        upper_bound = mid
+                        low = mid + 1
+                    else:
+                        high = mid - 1
+
+                
+                for value in range(upper_bound, 0, -1):
+                    new_t = current_t.copy()
+                    new_t[row][actual_col] = value
+                    if bfs(new_t, col_index + 1, columns_processed_current):
+                        return True
+                return False
+
+            bfs(t_tiles.copy(), 0, set())
+            return (s_tiles, best_t)
+
+        def maximize_row_with_spatial_constraint(s_tiles, t_tiles, row, target, fixed_rows_list, p_row):
+            """优化 Spatial (逻辑类似，但通常不涉及复杂的跨行保守估计，假设 Temporal 为当前值或 1)"""
+            fixed_positions = np.where(s_tiles[row] == 1)[0]
+            columns_to_process = [j for j in range(len(s_tiles[row])) if j not in fixed_positions]
+            columns_to_process.sort(key=lambda j: s_tiles[row][j], reverse=True)
+
+
+            best_s = s_tiles.copy()
+            best_objective = 0
+
+            def bfs(current_s, col_index, columns_processed):
+                nonlocal best_s, best_objective
+                # Spatial 阶段通常假设 Temporal 为 1 或者使用初始值，这里简化为直接检查乘积
+                # 如果需要严格保守，也可以类似 Temporal 那样处理
+                if np.prod(current_s[row]) <= target:
+                    obj = np.sum(p_row * current_s[row])
+                    if obj > best_objective:
+                        best_s = current_s.copy()
+                        best_objective = obj
+                    return True
+                if col_index >= len(columns_to_process): return False
+
+                
+                actual_col = columns_to_process[col_index]
+                cols_next = columns_processed.union({actual_col})
+                start_val = int(current_s[row][actual_col])
+
+
+                for v in range(start_val, 0, -1):
+                    new_s = current_s.copy()
+                    new_s[row][actual_col] = v
+                    if bfs(new_s, col_index + 1, cols_next): return True
+                return False
+
+            bfs(s_tiles.copy(), 0, set())
+            return (best_s, t_tiles)
+
+        # --- 主流程 ---
+        cluster_id = self.cluster_labels[k]
+        s_tiles = spatial_tiles.copy()
+        t_tiles = temporal_tiles.copy()
+
+        # 1. Spatial Optimization
+        s_fixed = []
+        for i in range(len(s_tiles)):
+            p_row = p.spatial_tile_weights[cluster_id]
+            s_tiles, t_tiles = maximize_row_with_spatial_constraint(
+                s_tiles, t_tiles, i, spatial_capacity_list[i], s_fixed, p_row
             )
-            temporal_fixed_rows.append(i)
-            print("44444444444445555555555555555", data)
-        # 计算最后一行
+            s_fixed.append(i)
+
+
+        # 2. Temporal Optimization
+        t_fixed = []
+        for i in range(len(t_tiles) - 1): # Exclude DRAM
+            buffer_cap = buffer_capacity_list[i]
+            p_row = p.temporal_tile_weights[cluster_id]
+            
+
+            s_tiles, t_tiles = maximize_row_with_temporal_constraint(
+                s_tiles, t_tiles, i, i, buffer_cap, t_fixed, p_row
+            )
+            t_fixed.append(i)
+
+
+        # 3. Compute Last Row
+        spatial_prod = np.prod(s_tiles, axis=0).astype(np.float64)
+        temporal_prod = np.prod(t_tiles[:-1], axis=0).astype(np.float64)
+        total_tile = spatial_prod * temporal_prod
+        last_row = np.ceil(np.array(self.tensor_dimensions_list[k]) / total_tile).astype(int)
+        last_row = np.maximum(last_row, 1)
         
-        def compute_last_row(dimension, spatial_tiles, temporal_tiles):
 
-            spatial_prod = np.prod(spatial_tiles, axis=0, dtype=np.float64)
-            temporal_prod = np.prod(temporal_tiles[:-1], axis=0, dtype=np.float64)
-            last_row = np.ceil(np.array(dimension) / (spatial_prod*temporal_prod)).astype(int)
+        t_tiles = np.vstack((t_tiles[:-1], last_row))
 
-            return last_row
-        last_row = compute_last_row(self.dimension[k], spatial_tiles, temporal_tiles)
-        temporal_tiles = np.vstack((temporal_tiles[:-1], last_row))
-        return (spatial_tiles, temporal_tiles)
+        return (s_tiles, t_tiles)
+        
 
     # 固定硬件，调mapping
     def _integerize_with_staged_optimization_with_config_all_DNN2(self, solutions, p):

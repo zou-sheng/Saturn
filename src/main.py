@@ -3,7 +3,7 @@ import yaml
 import os
 import pickle
 
-from explorer2 import MappingExplorer
+from explorer3 import MappingExplorer
 from datetime import datetime
 import json
 from hardware_first import HardwareFirstSearch

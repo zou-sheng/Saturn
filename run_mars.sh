@@ -155,17 +155,17 @@ cd ./src
 #     python main.py --optim_obj latency --population 100 --epochs 100 --accelerator Eyeriss --mapper MARS --type arch --version v1 --workload GCN_reddit --layer_id $layer_id --batch_size 1 --expanded_scope 0.1
 # done
 
-for layer_id in {0..5}
-do
-    printf "网络: gpt3, 层数: %d\n" $layer_id 
-    python main.py --optim_obj EDP --population 100 --epochs 100 --accelerator Simba --mapper MARS --type arch --version v1 --workload gpt3 --layer_id $layer_id --batch_size 1 --expanded_scope 0.0 --solver lp
-done
+# for layer_id in {0..5}
+# do
+#     printf "网络: gpt3, 层数: %d\n" $layer_id 
+#     python main.py --optim_obj EDP --population 100 --epochs 100 --accelerator Simba --mapper MARS --type arch --version v1 --workload gpt3 --layer_id $layer_id --batch_size 1 --expanded_scope 0.0 --solver lp
+# done
 
-for layer_id in {0..5}
-do
-    printf "网络: gpt1, 层数: %d\n" $layer_id 
-    python main.py --optim_obj EDP --population 100 --epochs 100 --accelerator Simba --mapper MARS --type arch --version v1 --workload gpt1 --layer_id $layer_id --batch_size 1 --expanded_scope 0.0 --solver lp
-done
+# for layer_id in {0..5}
+# do
+#     printf "网络: gpt1, 层数: %d\n" $layer_id 
+#     python main.py --optim_obj EDP --population 100 --epochs 100 --accelerator Simba --mapper MARS --type arch --version v1 --workload gpt1 --layer_id $layer_id --batch_size 1 --expanded_scope 0.0 --solver lp
+# done
 
 # for layer_id in {0..5}
 # do
