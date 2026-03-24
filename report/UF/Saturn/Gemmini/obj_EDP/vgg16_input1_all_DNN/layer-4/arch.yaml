@@ -1,17 +1,17 @@
 arch:
   arithmetic:
-    instances: 50176
+    instances: 37632
     word-bits: 8
   storage:
   - entries: 2
-    instances: 50176
+    instances: 37632
     n_banks: 1
     n_rdwr_ports: 2
     name: Registers
     word-bits: 8
   - depth: 1024
-    entries: 25088
-    instances: 256
+    entries: 1120
+    instances: 196
     n_banks: 2
     n_rdwr_ports: 2
     name: Accumulator
@@ -20,16 +20,16 @@ arch:
     word-bits: 32
   - class: SRAM
     depth: 16384
-    entries: 2656388
+    entries: 352256
     instances: 1
     n_banks: 4
     n_rdwr_ports: 1
     name: Scratchpad
     width: 128
     word-bits: 8
-  - bandwidth: 5.75
-    block_size: 64
+  - block_size: 64
     instances: 1
     name: DRAM
+    shared_bandwidth: 16
     technology: DRAM
     word-bits: 8

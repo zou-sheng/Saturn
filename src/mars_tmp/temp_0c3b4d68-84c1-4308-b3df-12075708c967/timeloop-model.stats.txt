@@ -1,0 +1,473 @@
+Buffer and Arithmetic Levels
+----------------------------
+Level 0
+-------
+=== __ARITH__ ===
+
+    SPECS
+    -----
+    Word bits             : 8
+    Instances             : 2304 (2304*1)
+    Compute energy        : 0.25 pJ
+
+    STATS
+    -----
+    Utilized instances      : 1824
+    Computes (total)        : 264757248
+    Cycles                  : 207360
+    Energy (total)          : 66189312.00 pJ
+    Area (total)            : 0.00 um^2
+
+Level 1
+-------
+=== Registers ===
+
+    SPECS
+    -----
+        Technology                      : SRAM
+        Size                            : 2
+        Word bits                       : 8
+        Block size                      : 1
+        Cluster size                    : 1
+        Instances                       : 2304 (2304*1)
+        Shared bandwidth                : -
+        Read bandwidth                  : -
+        Write bandwidth                 : -
+        Multiple buffering              : 1.00
+        Effective size                  : 2
+        Min utilization                 : 0.00
+        Vector access energy            : 0.49 pJ
+        Vector access energy source     : PAT
+        Per-instance-cycle leakage      : 0.00 pJ
+        Instances sharing power gating  : 1.00
+        Non-power-gated utilization     : 100.00%
+        Leakage energy (total)          : 0.00 pJ
+        Area                            : 0.00 um^2
+
+    STATS
+    -----
+    Cycles               : 207360
+    Bandwidth throttling : 1.00
+    Weights:
+        Partition size                           : 864
+        Utilized capacity                        : 2
+        Utilized instances (max)                 : 1368
+        Utilized clusters (max)                  : 1824
+        Scalar reads (per-instance)              : 193536
+        Scalar fills (per-instance)              : 10368
+        Scalar updates (per-instance)            : 0
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 203904
+        Energy (per-scalar-access)               : 0.49 pJ
+        Energy (per-instance)                    : 99400.40 pJ
+        Energy (total)                           : 135979744.79 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 0.74 words/cycle
+        Shared Bandwidth (total)                 : 1008.90 words/cycle
+        Read Bandwidth (per-instance)            : 0.70 words/cycle
+        Read Bandwidth (total)                   : 957.60 words/cycle
+        Write Bandwidth (per-instance)           : 0.04 words/cycle
+        Write Bandwidth (total)                  : 51.30 words/cycle
+
+Level 2
+-------
+=== AccumulationBuffer ===
+
+    SPECS
+    -----
+        Technology                      : SRAM
+        Size                            : 14
+        Word bits                       : 24
+        Block size                      : 1
+        Cluster size                    : 1
+        Instances                       : 1152 (1152*1)
+        Shared bandwidth                : -
+        Read bandwidth                  : -
+        Write bandwidth                 : -
+        Multiple buffering              : 1.00
+        Effective size                  : 14
+        Min utilization                 : 0.00
+        Vector access energy            : 1.47 pJ
+        Vector access energy source     : PAT
+        Per-instance-cycle leakage      : 0.00 pJ
+        Instances sharing power gating  : 1.00
+        Non-power-gated utilization     : 100.00%
+        Leakage energy (total)          : 0.00 pJ
+        Area                            : 0.00 um^2
+
+    STATS
+    -----
+    Cycles               : 207360
+    Bandwidth throttling : 1.00
+    Outputs:
+        Partition size                           : 168
+        Utilized capacity                        : 3
+        Utilized instances (max)                 : 912
+        Utilized clusters (max)                  : 912
+        Scalar reads (per-instance)              : 257880
+        Scalar fills (per-instance)              : 94875
+        Scalar updates (per-instance)            : 258048
+        Temporal reductions (per-instance)       : 257880
+        Address generations (per-cluster)        : 352923
+        Energy (per-scalar-access)               : 1.47 pJ
+        Energy (per-instance)                    : 895072.66 pJ
+        Energy (total)                           : 816306268.95 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 2.95 words/cycle
+        Shared Bandwidth (total)                 : 2686.40 words/cycle
+        Read Bandwidth (per-instance)            : 1.24 words/cycle
+        Read Bandwidth (total)                   : 1134.19 words/cycle
+        Write Bandwidth (per-instance)           : 1.70 words/cycle
+        Write Bandwidth (total)                  : 1552.21 words/cycle
+
+Level 3
+-------
+=== WeightBuffer ===
+
+    SPECS
+    -----
+        Technology                      : SRAM
+        Size                            : 2000
+        Word bits                       : 8
+        Block size                      : 4
+        Cluster size                    : 1
+        Instances                       : 1 (1*1)
+        Shared bandwidth                : -
+        Read bandwidth                  : -
+        Write bandwidth                 : -
+        Multiple buffering              : 1.00
+        Effective size                  : 2000
+        Min utilization                 : 0.00
+        Vector access energy            : 2.15 pJ
+        Vector access energy source     : PAT
+        Per-instance-cycle leakage      : 0.00 pJ
+        Instances sharing power gating  : 1.00
+        Non-power-gated utilization     : 100.00%
+        Leakage energy (total)          : 0.00 pJ
+        Area                            : 0.00 um^2
+
+    STATS
+    -----
+    Cycles               : 207360
+    Bandwidth throttling : 1.00
+    Weights:
+        Partition size                           : 82944
+        Utilized capacity                        : 192
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 995328
+        Scalar fills (per-instance)              : 995328
+        Scalar updates (per-instance)            : 0
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 1990656
+        Energy (per-scalar-access)               : 0.54 pJ
+        Energy (per-instance)                    : 1068008.20 pJ
+        Energy (total)                           : 1068008.20 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 9.60 words/cycle
+        Shared Bandwidth (total)                 : 9.60 words/cycle
+        Read Bandwidth (per-instance)            : 4.80 words/cycle
+        Read Bandwidth (total)                   : 4.80 words/cycle
+        Write Bandwidth (per-instance)           : 4.80 words/cycle
+        Write Bandwidth (total)                  : 4.80 words/cycle
+
+Level 4
+-------
+=== InputBuffer ===
+
+    SPECS
+    -----
+        Technology                      : SRAM
+        Size                            : 3856
+        Word bits                       : 8
+        Block size                      : 4
+        Cluster size                    : 1
+        Instances                       : 1 (1*1)
+        Shared bandwidth                : -
+        Read bandwidth                  : -
+        Write bandwidth                 : -
+        Multiple buffering              : 1.00
+        Effective size                  : 3856
+        Min utilization                 : 0.00
+        Vector access energy            : 2.33 pJ
+        Vector access energy source     : PAT
+        Per-instance-cycle leakage      : 0.00 pJ
+        Instances sharing power gating  : 1.00
+        Non-power-gated utilization     : 100.00%
+        Leakage energy (total)          : 0.00 pJ
+        Area                            : 0.00 um^2
+
+    STATS
+    -----
+    Cycles               : 207360
+    Bandwidth throttling : 1.00
+    Inputs:
+        Partition size                           : 645888
+        Utilized capacity                        : 798
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 7354368
+        Scalar fills (per-instance)              : 1735680
+        Scalar updates (per-instance)            : 0
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 9090048
+        Energy (per-scalar-access)               : 0.58 pJ
+        Energy (per-instance)                    : 5290870.43 pJ
+        Energy (total)                           : 5290870.43 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 43.84 words/cycle
+        Shared Bandwidth (total)                 : 43.84 words/cycle
+        Read Bandwidth (per-instance)            : 35.47 words/cycle
+        Read Bandwidth (total)                   : 35.47 words/cycle
+        Write Bandwidth (per-instance)           : 8.37 words/cycle
+        Write Bandwidth (total)                  : 8.37 words/cycle
+
+Level 5
+-------
+=== GlobalBuffer ===
+
+    SPECS
+    -----
+        Technology                      : SRAM
+        Size                            : 324864
+        Word bits                       : 8
+        Block size                      : 8
+        Cluster size                    : 1
+        Instances                       : 1 (1*1)
+        Shared bandwidth                : -
+        Read bandwidth                  : -
+        Write bandwidth                 : -
+        Multiple buffering              : 1.00
+        Effective size                  : 324864
+        Min utilization                 : 0.00
+        Vector access energy            : 67.67 pJ
+        Vector access energy source     : PAT
+        Per-instance-cycle leakage      : 0.00 pJ
+        Instances sharing power gating  : 1.00
+        Non-power-gated utilization     : 100.00%
+        Leakage energy (total)          : 0.00 pJ
+        Area                            : 0.00 um^2
+
+    STATS
+    -----
+    Cycles               : 207360
+    Bandwidth throttling : 1.00
+    Inputs:
+        Partition size                           : 645888
+        Utilized capacity                        : 76608
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 1735680
+        Scalar fills (per-instance)              : 890880
+        Scalar updates (per-instance)            : 0
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 2626560
+        Energy (per-scalar-access)               : 8.46 pJ
+        Energy (per-instance)                    : 22216869.95 pJ
+        Energy (total)                           : 22216869.95 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 12.67 words/cycle
+        Shared Bandwidth (total)                 : 12.67 words/cycle
+        Read Bandwidth (per-instance)            : 8.37 words/cycle
+        Read Bandwidth (total)                   : 8.37 words/cycle
+        Write Bandwidth (per-instance)           : 4.30 words/cycle
+        Write Bandwidth (total)                  : 4.30 words/cycle
+    Outputs:
+        Partition size                           : 150528
+        Utilized capacity                        : 13440
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 86528688
+        Scalar fills (per-instance)              : 0
+        Scalar updates (per-instance)            : 86679216
+        Temporal reductions (per-instance)       : 86528688
+        Address generations (per-cluster)        : 86679216
+        Energy (per-scalar-access)               : 8.46 pJ
+        Energy (per-instance)                    : 1465086454.31 pJ
+        Energy (total)                           : 1465086454.31 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 835.30 words/cycle
+        Shared Bandwidth (total)                 : 835.30 words/cycle
+        Read Bandwidth (per-instance)            : 417.29 words/cycle
+        Read Bandwidth (total)                   : 417.29 words/cycle
+        Write Bandwidth (per-instance)           : 418.01 words/cycle
+        Write Bandwidth (total)                  : 418.01 words/cycle
+
+Level 6
+-------
+=== DRAM ===
+
+    SPECS
+    -----
+        Technology                      : DRAM
+        Size                            : -
+        Word bits                       : 8
+        Block size                      : 64
+        Cluster size                    : 1
+        Instances                       : 1 (1*1)
+        Shared bandwidth                : -
+        Read bandwidth                  : 0.50
+        Write bandwidth                 : 0.50
+        Multiple buffering              : 1.00
+        Effective size                  : -
+        Min utilization                 : 0.00
+        Vector access energy            : 6400.00 pJ
+        Vector access energy source     : PAT
+        Per-instance-cycle leakage      : 0.00 pJ
+        Instances sharing power gating  : 1.00
+        Non-power-gated utilization     : 100.00%
+        Leakage energy (total)          : 0.00 pJ
+        Area                            : 0.00 um^2
+
+    STATS
+    -----
+    Cycles               : 3772416
+    Bandwidth throttling : 0.05
+    Weights:
+        Partition size                           : 82944
+        Utilized capacity                        : 82944
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 995328
+        Scalar fills (per-instance)              : 0
+        Scalar updates (per-instance)            : 0
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 995328
+        Energy (per-scalar-access)               : 100.00 pJ
+        Energy (per-instance)                    : 99532800.00 pJ
+        Energy (total)                           : 99532800.00 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 0.26 words/cycle
+        Shared Bandwidth (total)                 : 0.26 words/cycle
+        Read Bandwidth (per-instance)            : 0.26 words/cycle
+        Read Bandwidth (total)                   : 0.26 words/cycle
+        Write Bandwidth (per-instance)           : 0.00 words/cycle
+        Write Bandwidth (total)                  : 0.00 words/cycle
+    Inputs:
+        Partition size                           : 645888
+        Utilized capacity                        : 645888
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 890880
+        Scalar fills (per-instance)              : 0
+        Scalar updates (per-instance)            : 0
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 890880
+        Energy (per-scalar-access)               : 100.00 pJ
+        Energy (per-instance)                    : 89088000.00 pJ
+        Energy (total)                           : 89088000.00 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 0.24 words/cycle
+        Shared Bandwidth (total)                 : 0.24 words/cycle
+        Read Bandwidth (per-instance)            : 0.24 words/cycle
+        Read Bandwidth (total)                   : 0.24 words/cycle
+        Write Bandwidth (per-instance)           : 0.00 words/cycle
+        Write Bandwidth (total)                  : 0.00 words/cycle
+    Outputs:
+        Partition size                           : 150528
+        Utilized capacity                        : 150528
+        Utilized instances (max)                 : 1
+        Utilized clusters (max)                  : 1
+        Scalar reads (per-instance)              : 0
+        Scalar fills (per-instance)              : 0
+        Scalar updates (per-instance)            : 150528
+        Temporal reductions (per-instance)       : 0
+        Address generations (per-cluster)        : 150528
+        Energy (per-scalar-access)               : 100.00 pJ
+        Energy (per-instance)                    : 15052800.00 pJ
+        Energy (total)                           : 15052800.00 pJ
+        Temporal Reduction Energy (per-instance) : 0.00 pJ
+        Temporal Reduction Energy (total)        : 0.00 pJ
+        Address Generation Energy (per-cluster)  : 0.00 pJ
+        Address Generation Energy (total)        : 0.00 pJ
+        Bandwidth Consumption Scale              : 1.00
+        Shared Bandwidth (per-instance)          : 0.04 words/cycle
+        Shared Bandwidth (total)                 : 0.04 words/cycle
+        Read Bandwidth (per-instance)            : 0.00 words/cycle
+        Read Bandwidth (total)                   : 0.00 words/cycle
+        Write Bandwidth (per-instance)           : 0.04 words/cycle
+        Write Bandwidth (total)                  : 0.04 words/cycle
+
+Networks
+--------
+
+Operational Intensity Stats
+---------------------------
+    Total elementwise ops                   : 264757248
+    Total reduction ops                     : 264606720
+    Total ops                               : 529363968
+    Total memory accesses required          : 879360
+    Optimal Op per Byte                     : 601.99
+
+=== Registers ===
+    Total scalar accesses                   : 278940672
+    Op per Byte                             : 1.90
+=== AccumulationBuffer ===
+    Total scalar accesses                   : 557052336
+    Op per Byte                             : 0.32
+=== WeightBuffer ===
+    Total scalar accesses                   : 1990656
+    Op per Byte                             : 265.92
+=== InputBuffer ===
+    Total scalar accesses                   : 9090048
+    Op per Byte                             : 58.24
+=== GlobalBuffer ===
+    Total scalar accesses                   : 175834464
+    Op per Byte                             : 3.01
+=== DRAM ===
+    Total scalar accesses                   : 2036736
+    Op per Byte                             : 259.91
+
+
+Summary Stats
+-------------
+GFLOPs (@1GHz): 140.32
+Utilization: 3.05%
+Cycles: 3772416
+Energy: 2715.81 uJ
+EDP(J*cycle): 1.02e+04
+Area: 0.00 mm^2
+
+Computes = 264757248
+fJ/Compute
+    __ARITH__                            = 250.00
+    Registers                            = 513.60
+    AccumulationBuffer                   = 3083.23
+    WeightBuffer                         = 4.03
+    InputBuffer                          = 19.98
+    GlobalBuffer                         = 5617.61
+    DRAM                                 = 769.28
+    Total                                = 10257.74
+

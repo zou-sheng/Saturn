@@ -1,0 +1,47 @@
+arch:
+  arithmetic:
+    instances: 8064
+    word-bits: 8
+  storage:
+  - cluster-size: 1
+    entries: 1
+    instances: 8064
+    name: Registers
+    num-banks: 8
+    num-ports: 2
+    word-bits: 8
+  - cluster-size: 1
+    entries: 1216
+    instances: 4
+    name: AccumulationBuffer
+    network-word-bits: 16
+    num-banks: 2
+    num-ports: 2
+    word-bits: 24
+  - block-size: 4
+    entries: 20736
+    instances: 2
+    name: WeightBuffer
+    num-banks: 8
+    num-ports: 1
+    word-bits: 8
+  - block-size: 4
+    entries: 100352
+    instances: 2
+    name: InputBuffer
+    num-banks: 1
+    num-ports: 2
+    word-bits: 8
+  - block-size: 8
+    entries: 322560
+    instances: 1
+    name: GlobalBuffer
+    num-banks: 256
+    num-ports: 2
+    word-bits: 8
+  - bandwidth: 1
+    block-size: 64
+    instances: 1
+    name: DRAM
+    technology: DRAM
+    word-bits: 8

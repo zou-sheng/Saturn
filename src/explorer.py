@@ -2794,7 +2794,7 @@ class MappingExplorer:
                 shutil.rmtree(temp_dir)
         return self.judge()
 
-    def thread_fun_hardware(self, p):
+    def thread_fun_hardware_back(self, p):
         original_dir = os.getcwd()
         # 创建一个唯一的临时文件夹
         temp_dir = f'{original_dir}/mars_tmp/temp_{uuid.uuid4()}'
@@ -2836,7 +2836,7 @@ class MappingExplorer:
             shutil.rmtree(temp_dir)
         return rewards, values_list, mapping_list  
 
-    def thread_fun_hardware_back(self, p):
+    def thread_fun_hardware(self, p):
         original_dir = os.getcwd()
         # 创建一个唯一的临时文件夹
         temp_dir = f'{original_dir}/mars_tmp/temp_{uuid.uuid4()}'

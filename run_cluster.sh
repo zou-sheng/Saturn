@@ -1,0 +1,9 @@
+./run_saturn.sh densenet161 Simba 1  > uf_cluster_1.out
+./run_saturn.sh densenet161 Simba 2  > uf_cluster_2.out
+./run_saturn.sh densenet161 Simba 4  > uf_cluster_4.out
+./run_saturn.sh densenet161 Simba 8  > uf_cluster_8.out
+./run_saturn.sh densenet161 Simba 16  > uf_cluster_16.out
+./run_saturn.sh densenet161 Simba 32  > uf_cluster_32.out
+./run_saturn.sh densenet161 Simba 64  > uf_cluster_64.out
+./run_saturn.sh densenet161 Simba 128  > uf_cluster_128.out
+./run_saturn.sh densenet161 Simba 256  > uf_cluster_256.out

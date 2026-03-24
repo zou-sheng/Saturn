@@ -907,11 +907,11 @@ class MappingExplorer:
         # except Exception as e:
         #     print(f"发生错误: {e}")
         #     rewards = None
-
+        a = (raw_metrics["cycles"], raw_metrics["energy"])
         # finally:
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
-        return rewards, values_list, mapping_list
+        return rewards, values_list, mapping_list, a
 
     def select_parents(self, pop, fitness, num_parents, num_population, stage_idx=0, first_stage_value=None):
         # 选择在当前代中表现最好的个体作为下一代后代的父母
@@ -1053,6 +1053,7 @@ class MappingExplorer:
                 reward_list = [res[0] for res in results]
                 tile_value_list = [res[1] for res in results]
                 mapping_list = [res[2] for res in results]
+                a = [res[3] for res in results]
                 for idx_prob in range(len(self.problems_list)):
                     current_tile_weights_scores = -float('inf')
                     current_temporal_tile_weights = None
@@ -1095,9 +1096,11 @@ class MappingExplorer:
                     best_reward = copy.deepcopy(fitness[gen_best_idx])
                     best_sol = copy.deepcopy(population[gen_best_idx])
                     best_values = copy.deepcopy(tile_value_list[gen_best_idx])
+                    best_a = copy.deepcopy(a[gen_best_idx])
+
                 print(best_values)
                 print(no_mutation)
-
+                print("total_cycles, total_energy", best_a)
                 num_parents = int(num_population * parents_ratio)
                 num_parents = min(num_parents, len(population) - count_non_valid)
                 parents_ratio *= ratio_decay

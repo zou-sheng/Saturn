@@ -1,29 +1,37 @@
 mapping:
-- factors: R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1
+- factors: R=1 S=1 P=1 Q=1 C=2 K=1 H=1 N=1
   permutation: RSPQCKHN
   target: Registers
   type: temporal
-- factors: R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1
+- factors: R=3 S=1 P=1 Q=1 C=1 K=1 H=1 N=1
   permutation: RSPQCKHN
   target: AccumulationBuffer
   type: spatial
-- factors: R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1
+- factors: R=1 S=1 P=1 Q=1 C=127,1 K=1 H=1 N=1
   permutation: RSPQCKHN
   target: AccumulationBuffer
   type: temporal
-- factors: R=1 S=3 P=14 Q=1 C=1 K=256 H=1 N=1
+- factors: R=1 S=1 P=1 Q=1 C=1 K=86,84 H=1 N=1
+  permutation: RSPQCKHN
+  target: WeightBuffer
+  type: spatial
+- factors: R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1
   permutation: RSPQCKHN
   target: WeightBuffer
   type: temporal
-- factors: R=1 S=1 P=1 Q=13,1 C=1 K=1 H=1 N=1
+- factors: R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1
   permutation: RSPQCKHN
   target: InputBuffer
   type: temporal
-- factors: R=3 S=1 P=1 Q=1 C=1 K=1 H=1 N=1
+- factors: R=1 S=1 P=4,2 Q=1 C=1 K=1 H=1 N=1
+  permutation: RSPQCKHN
+  target: GlobalBuffer
+  type: spatial
+- factors: R=1 S=1 P=4 Q=14 C=1 K=1 H=1 N=1
   permutation: RSPQCKHN
   target: GlobalBuffer
   type: temporal
-- factors: R=1 S=1 P=1 Q=2 C=4 K=1 H=1 N=1
+- factors: R=1 S=3 P=1 Q=1 C=2 K=3 H=1 N=1
   permutation: RSPQCKHN
   target: DRAM
   type: temporal

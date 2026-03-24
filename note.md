@@ -233,3 +233,6 @@ Soter是生成一组解，然后让transformer学习这组解好的为什么好�
         solution = compute_last_row(data)
         return solution
 ```
+
+
+每一级存储器的带宽好像都有用，就是看看对面积的影响了。

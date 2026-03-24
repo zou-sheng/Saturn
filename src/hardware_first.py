@@ -440,7 +440,8 @@ class HardwareFirstSearch:
                             "instances": 1,
                             "name": "DRAM",
                             "technology": "DRAM",
-                            "word-bits": 8
+                            "word-bits": 8,
+                            "shared_bandwidth": 16
                         }
                     ]
                 }

@@ -44,7 +44,7 @@ class HardwareConfig:
         self.spatial_capacity = buffer_spatial_list
 
         
-    def mutation(self, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+    def mutation(self, best_spatial_tile_weights, best_temporal_tile_weights, best_buffer_temporal_weights, best_buffer_spatial_weights, no_mutation, alpha=0.5, generation=0, max_generations=200):
         # self.mutate_noc()
         # self.mutate_tensor_in_buffer()
         self.mutate_temporal_tile_weights(best_temporal_tile_weights, no_mutation, alpha=alpha, generation=generation, max_generations=max_generations)
@@ -54,7 +54,7 @@ class HardwareConfig:
         # self.mutate_buffer_temporal_order()
         # self.mutate_buffer_spatial_order()
 
-    def mutation_for_DNN(self, best_spatial_tile_weights, best_temporal_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+    def mutation_for_DNN(self, best_spatial_tile_weights, best_temporal_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=200):
         # self.mutate_noc()
         # self.mutate_tensor_in_buffer()
         self.mutate_temporal_tile_weights(best_temporal_tile_weights, no_mutation, alpha=alpha, generation=generation, max_generations=max_generations)
@@ -70,7 +70,7 @@ class HardwareConfig:
     def mutate_tensor_in_buffer(self):
         pass
 
-    def mutate_temporal_tile_weights(self, best_temporal_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+    def mutate_temporal_tile_weights(self, best_temporal_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=200):
         layer_num = len(self.temporal_tile_weights)
         for i in range(layer_num):
             if no_mutation[i] == True:
@@ -85,7 +85,7 @@ class HardwareConfig:
                     self.mutate_factor(self.temporal_tile_weights[i], alpha=alpha, generation=generation, max_generations=max_generations)
                 self.shuffle_order(self.temporal_tile_weights[i], alpha=alpha)
 
-    def mutate_spatial_tile_weights(self, best_spatial_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=100):
+    def mutate_spatial_tile_weights(self, best_spatial_tile_weights, no_mutation, alpha=0.5, generation=0, max_generations=200):
         layer_num = len(self.spatial_tile_weights)
         for i in range(layer_num):
             if no_mutation[i] == True:
@@ -100,19 +100,21 @@ class HardwareConfig:
                     self.mutate_factor(self.spatial_tile_weights[i], alpha=alpha, generation=generation, max_generations=max_generations)
                 self.shuffle_order(self.spatial_tile_weights[i], alpha=alpha)
 
-    def mutate_buffer_temporal_weights(self, best_buffer_temporal_weights, alpha=0.5, generation=0, max_generations=100):
+    def mutate_buffer_temporal_weights(self, best_buffer_temporal_weights, alpha=0.5, generation=0, max_generations=200):
         if random.random() < 0.7:
             self.buffer_temporal_weights = random.choice(best_buffer_temporal_weights)
         else:
-            self.mutate_factor(self.buffer_temporal_weights, alpha=alpha, generation=generation, max_generations=max_generations)
-            self.shuffle_order(self.buffer_temporal_weights)
+            if random.random() < 0.9:
+                self.mutate_factor(self.buffer_temporal_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+                self.shuffle_order(self.buffer_temporal_weights)
 
-    def mutate_buffer_spatial_weights(self, best_buffer_spatial_weights, alpha=0.5, generation=0, max_generations=100):
+    def mutate_buffer_spatial_weights(self, best_buffer_spatial_weights, alpha=0.5, generation=0, max_generations=200):
         if random.random() < 0.7:
             self.buffer_spatial_weights = random.choice(best_buffer_spatial_weights)
         else:
-            self.mutate_factor(self.buffer_spatial_weights, alpha=alpha, generation=generation, max_generations=max_generations)
-            self.shuffle_order(self.buffer_spatial_weights)
+            if random.random() < 0.9:
+                self.mutate_factor(self.buffer_spatial_weights, alpha=alpha, generation=generation, max_generations=max_generations)
+                self.shuffle_order(self.buffer_spatial_weights)
 
     def mutate_buffer_temporal_order(self):
         pass
@@ -120,7 +122,7 @@ class HardwareConfig:
     def mutate_buffer_spatial_order(self):
         pass
 
-    def gaussian_mutation(self, arr, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
+    def gaussian_mutation(self, arr, alpha=0.5, generation=0, max_generations=200, sigma_base=0.2):
         """
         带自适应步长的高斯变异算子
         
@@ -156,7 +158,7 @@ class HardwareConfig:
         
         return arr
     
-    def mutate_factor(self, arr, alpha=0.5, generation=0, max_generations=100):
+    def mutate_factor(self, arr, alpha=0.5, generation=0, max_generations=200):
         """带自适应幅度的因子变异"""
         # 变异幅度随代数衰减（早期探索，后期开发）
         decay_factor = 1.0 - (generation / max_generations) * 0.7
@@ -1131,8 +1133,8 @@ class MappingExplorer:
             prob += spatial_capacity[1] + spatial_capacity[2]  <= 14
 
             # 正方形阵列
-            # prob += spatial_capacity[2] == spatial_capacity[1]
-            # prob += spatial_capacity[2] == 6 #math.log2(112)
+            prob += spatial_capacity[2] == spatial_capacity[1]
+            # prob += spatial_capacity[2] == math.log2(112)
         
         elif self.accl_name == 'NEW':
             # buffer_capacity限制
@@ -1187,10 +1189,10 @@ class MappingExplorer:
 
         # 不包含DRAM，所以是rows-1行
         for i in range(rows-1):
-            objective += spatial_capacity[i] * p.buffer_spatial_weights[i]
+            objective -= spatial_capacity[i] * p.buffer_spatial_weights[i]
 
         for i in range(rows-1):
-            objective += buffer_capacity[i] * p.buffer_temporal_weights[i]
+            objective -= buffer_capacity[i] * p.buffer_temporal_weights[i]
 
         prob += objective
         
@@ -1240,7 +1242,7 @@ class MappingExplorer:
         # print(solution)
         # print("time1: ", time.time()-start_time)
         # 映射优先的调整
-        solutions, config = self._integerize_with_staged_optimization_with_config_all_DNN2(solutions, p)
+        solutions, config = self._integerize_with_staged_optimization_with_config_all_DNN(solutions, p)
         # print("time2: ", time.time()-start_time)
         
         return solutions, config
@@ -2682,7 +2684,7 @@ class MappingExplorer:
         for i in range(num_population):
             temporal_tile_weights = []
             spatial_tile_weights = []
-            for n in range(self.cluster_num): 
+            for n in range(min(self.cluster_num, len(self.problems_list))): 
                 temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
                 spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
             buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
@@ -2722,7 +2724,7 @@ class MappingExplorer:
         for i in range(num_population):
             temporal_tile_weights = []
             spatial_tile_weights = []
-            for n in range(self.cluster_num): 
+            for n in range(min(self.cluster_num, len(self.problems_list))): 
                 temporal_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
                 spatial_tile_weights.append(np.random.uniform(low=1.0, high=100.0, size=(row, col)))
             buffer_temporal_weights = np.random.randint(10, 100, size=row).astype(float)
@@ -3042,7 +3044,7 @@ class MappingExplorer:
         # except Exception as e:
         #     print(f"发生错误: {e}")
         #     rewards = None
-        a = (total_cycles, total_energy)
+        a = (raw_metrics["cycles"], raw_metrics["energy"])
         # finally:
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
@@ -3456,7 +3458,7 @@ class MappingExplorer:
             else:
                 raise ValueError("输入数组必须是一维或二维")
 
-        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=100):
+        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=200):
             """带自适应幅度的因子变异"""
             # 变异幅度随代数衰减（早期探索，后期开发）
             decay_factor = 1.0 - (generation / max_generations) * 0.7
@@ -3483,7 +3485,7 @@ class MappingExplorer:
             
             return arr
  
-        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
+        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=200, sigma_base=0.2):
             """
             带自适应步长的高斯变异算子
             
@@ -3916,7 +3918,7 @@ class MappingExplorer:
             else:
                 raise ValueError("输入数组必须是一维或二维")
 
-        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=100):
+        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=200):
             decay_factor = 1.0 - (generation / max_generations) * 0.7
             if arr.ndim == 2:
                 rows, cols = arr.shape
@@ -3936,7 +3938,7 @@ class MappingExplorer:
                             arr[i] *= (1 - 0.3 * decay_factor)
             return arr
 
-        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
+        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=200, sigma_base=0.2):
             decay_factor = 1.0 - (generation / max_generations) * 0.7
             sigma = sigma_base * decay_factor
             if arr.ndim == 2:
@@ -4397,7 +4399,7 @@ class MappingExplorer:
             else:
                 raise ValueError("输入数组必须是一维或二维")
 
-        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=100):
+        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=200):
             """带自适应幅度的因子变异"""
             # 变异幅度随代数衰减（早期探索，后期开发）
             decay_factor = 1.0 - (generation / max_generations) * 0.7
@@ -4424,7 +4426,7 @@ class MappingExplorer:
             
             return arr
  
-        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
+        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=200, sigma_base=0.2):
             """
             带自适应步长的高斯变异算子
             
@@ -4934,7 +4936,7 @@ class MappingExplorer:
             else:
                 raise ValueError("输入数组必须是一维或二维")
 
-        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=100):
+        def mutate_factor(arr, alpha=0.5, generation=0, max_generations=200):
             """带自适应幅度的因子变异"""
             # 变异幅度随代数衰减（早期探索，后期开发）
             decay_factor = 1.0 - (generation / max_generations) * 0.7
@@ -4961,7 +4963,7 @@ class MappingExplorer:
             
             return arr
  
-        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=100, sigma_base=0.2):
+        def gaussian_mutation(arr, alpha=0.5, generation=0, max_generations=200, sigma_base=0.2):
             """
             带自适应步长的高斯变异算子
             

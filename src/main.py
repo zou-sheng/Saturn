@@ -3,11 +3,11 @@ import yaml
 import os
 import pickle
 
-from explorer3 import MappingExplorer
+from explorer2 import MappingExplorer
 from datetime import datetime
 import json
 from hardware_first import HardwareFirstSearch
-from mapping_first import MappingFirstSearch
+from mapping_first import mapping_first_search
 
 def main():
     # current_time = datetime.now()
@@ -226,7 +226,7 @@ def main():
             print(opt.population)
             chkpt = HF.run()
         elif search_mode == "MF":
-            MF = MappingFirstSearch(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, all_DNN=all_DNN)
+            MF = mapping_first_search(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN, population=opt.population, epochs=opt.epochs)
             print(opt.population)
             chkpt = MF.run(num_population=opt.population, num_generations=opt.epochs)
     else:
