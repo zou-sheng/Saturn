@@ -17,6 +17,8 @@ from collections import deque
 import time
 import cvxpy as cp
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score, calinski_harabasz_score
+import pprint
 # from skopt import gp_minimize
 # from skopt.space import Integer
 # from skopt.utils import use_named_args
@@ -445,81 +447,105 @@ class MappingExplorer:
         self.cluster_labels, self.n_clusters = self.cluster_layers(self.cluster_num)
         
 
-    def cluster_layers(self, n_clusters=4):
-
+    def cluster_layers(self, n_clusters=4, verbose=True):
         """
-
-        根据层的维度特征进行聚类
-
+        根据层的维度特征进行聚类，并输出聚类详情和评估指标。
+        
+        参数:
+            n_clusters: 期望的聚类数量
+            verbose: 是否打印详细报告
+        
         返回: 
-
-        1. cluster_labels: 每一层所属的类别ID (列表，长度=layer_num)
-
-        2. n_clusters: 实际聚类数
-
+            1. cluster_labels: 每一层所属的类别ID (列表，长度=layer_num)
+            2. n_clusters: 实际聚类数
         """
-
         if not self.all_DNN or not self.problems_list:
-
+            if verbose: print("[Clustering] No data available.")
             return None, 0
 
-        
-
-        # 提取特征：[R, S, C, K, P, Q, N] (对数尺度，避免大数主导)
-
+        # 1. 提取特征：[R, S, C, K, P, Q, N] (对数尺度)
         features = []
-
-        for prob in self.problems_list:
-
+        for idx, prob in enumerate(self.problems_list):
             inst = prob['problem']['instance']
-
-            # 提取关键维度，取log2防止数值差异过大
-
+            # 提取关键维度，取log2防止数值差异过大，避免 log(0)
             f = [
-
                 np.log2(max(inst.get('R', 1), 1)),
-
                 np.log2(max(inst.get('S', 1), 1)),
-
                 np.log2(max(inst.get('C', 1), 1)),
-
                 np.log2(max(inst.get('K', 1), 1)),
-
                 np.log2(max(inst.get('P', 1), 1)),
-
                 np.log2(max(inst.get('Q', 1), 1)),
-
                 np.log2(max(inst.get('N', 1), 1)),
-
             ]
-
             features.append(f)
-
         
-
         features = np.array(features)
-
-        
-
-        # 简单处理：如果层数少于聚类数，则每层一类
-
         layer_num = len(features)
 
+        # 2. 边界情况处理
         if layer_num <= n_clusters:
-
+            if verbose:
+                print(f"[Clustering] Layer count ({layer_num}) <= n_clusters ({n_clusters}). Assigning each layer to its own cluster.")
             return list(range(layer_num)), layer_num
 
-        
-
-        # 运行 K-Means
-
+        # 3. 运行 K-Means
         kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
-
         labels = kmeans.fit_predict(features)
+        labels_list = labels.tolist()
 
-        
+        # 4. 输出分析报告 (如果 verbose 为 True)
+        if verbose:
+            print("\n" + "="*60)
+            print(f"📊 DNN Layer Clustering Report (K={n_clusters})")
+            print("="*60)
+            
+            # --- A. 展示每一类包含的层 ---
+            cluster_groups = {}
+            for idx, label in enumerate(labels_list):
+                if label not in cluster_groups:
+                    cluster_groups[label] = []
+                cluster_groups[label].append(idx)
+            
+            print(f"\n📂 Cluster Distribution (Total Layers: {layer_num}):")
+            for cid in sorted(cluster_groups.keys()):
+                layers = cluster_groups[cid]
+                # 如果层数太多，只显示前10个，避免刷屏
+                display_layers = layers if len(layers) <= 10 else layers[:10] + ["..."]
+                print(f"   • Cluster {cid}: {len(layers)} layers -> Indices: {display_layers}")
 
-        return labels.tolist(), n_clusters
+            # --- B. 计算并展示聚类指标 ---
+            print("\n📈 Clustering Quality Metrics:")
+            
+            # 1. Inertia (类内平方和) - 越低越好
+            inertia = kmeans.inertia_
+            print(f"   • Inertia (Within-cluster sum of squares): {inertia:.4f}")
+            
+            # 2. Silhouette Score (轮廓系数) - [-1, 1], 越高越好
+            # 注意：如果 n_clusters=1，无法计算
+            if n_clusters > 1:
+                sil_score = silhouette_score(features, labels)
+                print(f"   • Silhouette Score: {sil_score:.4f} (Closer to 1.0 is better)")
+                
+                # 3. Calinski-Harabasz Score - 越高越好
+                ch_score = calinski_harabasz_score(features, labels)
+                print(f"   • Calinski-Harabasz Score: {ch_score:.4f} (Higher is better)")
+            else:
+                print("   • Silhouette & CH Scores: N/A (Requires K > 1)")
+
+            # --- C. 简单解读 ---
+            if n_clusters > 1:
+                sil_score = silhouette_score(features, labels)
+                if sil_score > 0.5:
+                    interpretation = "Strong structure found."
+                elif sil_score > 0.25:
+                    interpretation = "Reasonable structure."
+                else:
+                    interpretation = "Weak structure; consider adjusting K or features."
+                print(f"\n💡 Interpretation: {interpretation}")
+            
+            print("="*60 + "\n")
+
+        return labels_list, n_clusters
 
     def shuffle_factor_order(self, mapping, alpha=0.5):
         if random.random() < alpha:
@@ -1084,17 +1110,17 @@ class MappingExplorer:
             prob += spatial_capacity[0] <= 0
             prob += spatial_capacity[0] >= 0
             # AccumulationBuffer
-            prob += spatial_capacity[1] <= 10
-            prob += spatial_capacity[1] >= 0
+            prob += spatial_capacity[1] <= 7
+            prob += spatial_capacity[1] >= 3
             # WeightBuffer
-            prob += spatial_capacity[2] <= 10
-            prob += spatial_capacity[2] >= 0
+            prob += spatial_capacity[2] <= 7
+            prob += spatial_capacity[2] >= 3
             # InputBuffer
             prob += spatial_capacity[3] <= 0
             prob += spatial_capacity[3] >= 0
             # GlobalBuffer
-            prob += spatial_capacity[4] <= 10
-            prob += spatial_capacity[4] >= 0
+            prob += spatial_capacity[4] <= 7
+            prob += spatial_capacity[4] >= 3
             # DRAM
             prob += spatial_capacity[5] <= 0
             prob += spatial_capacity[5] >= 0
@@ -5403,7 +5429,7 @@ class MappingExplorer:
                 print(best_values)
                 print(no_mutation)
                 print("total_cycles, total_energy", best_a)
-
+                print("total_cycles, total_energy", sum(best_a[0]), sum(best_a[1]))
                 num_parents = int(num_population * parents_ratio)
                 num_parents = min(num_parents, len(population) - count_non_valid)
                 parents_ratio *= ratio_decay

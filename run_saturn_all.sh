@@ -7,18 +7,18 @@ DNN_MODELS=(
     "llama2_7B"
     "llama2_13B"
     "llama2_34B"
-    "bert"
-    "vgg16"
-    "resnet50"
-    "alexnet"
-    "retinanet"
-    "unet"
+    # "bert"
+    # "vgg16"
+    # "resnet50"
+    # "alexnet"
+    # "retinanet"
+    # "unet"
 )
 
 # 2. 定义需要自动运行的加速器列表（Simba + Gemmini）
 ACCELERATORS=(
     "Simba"
-    "Gemmini"
+    # "Gemmini"
 )
 
 # 3. 输出根目录（所有加速器+模型的日志/时间记录）
@@ -60,7 +60,7 @@ for ACCELERATOR in "${ACCELERATORS[@]}"; do
         STATUS="成功"
 
         # 4. 执行 ./run_saturn.sh（传入模型名+加速器）
-        if ./run_saturn.sh "${DNN}" "${ACCELERATOR}" > "${MODEL_LOG}" 2>&1; then
+        if ./run_saturn.sh "${DNN}" "${ACCELERATOR}" 1 > "${MODEL_LOG}" 2>&1; then
             echo "✅ ${DNN} (${ACCELERATOR}) 运行完成！"
         else
             STATUS="失败"

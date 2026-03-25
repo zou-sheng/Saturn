@@ -1,14 +1,15 @@
 DRAM [ Weights:13824 (13824) Inputs:70778880 (70778880) Outputs:5120 (5120) ] 
 -----------------------------------------------------------------------------
-| for P in [0:5120)
+| for P in [0:1024)
 
-GlobalBuffer [ Inputs:13824 (13824) Outputs:1 (1) ] 
-InputBuffer [ Inputs:13824 (13824) ] 
+GlobalBuffer [ Inputs:69120 (69120) Outputs:5 (5) ] 
+InputBuffer [ Inputs:69120 (69120) ] 
 WeightBuffer [ Weights:13824 (13824) ] 
-AccumulationBuffer [ Outputs:1 (1) ] 
+AccumulationBuffer [ Outputs:5 (5) ] 
 ------------------------------------
 |   for C in [0:13824)
 
 Registers [ Weights:1 (1) ] 
 ---------------------------
-|     << Compute >>
+|     for P in [0:5)
+|       << Compute >>
