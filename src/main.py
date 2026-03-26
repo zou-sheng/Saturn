@@ -4,6 +4,9 @@ import os
 import pickle
 
 from explorer2 import MappingExplorer
+from no_constraint_opt import MappingExplorer_no_constraint_opt
+from no_obj_guide import MappingExplorer_no_obj_guide
+from mapping_constraint import MappingExplorer_mapping_constraint
 from datetime import datetime
 import json
 from hardware_first import HardwareFirstSearch
@@ -229,6 +232,18 @@ def main():
             MF = mapping_first_search(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN, population=opt.population, epochs=opt.epochs)
             print(opt.population)
             chkpt = MF.run(num_population=opt.population, num_generations=opt.epochs)
+        elif search_mode == "no_constraint_opt":
+            ME = MappingExplorer_no_constraint_opt(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
+        elif search_mode == "no_obj_guide":
+            ME = MappingExplorer_no_obj_guide(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
+        elif search_mode == "mapping_constraint":
+            ME = MappingExplorer_mapping_constraint(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
     else:
         with open(os.path.join(benchmark_dir, '{}_workload/layers.yaml'.format(workload)), 'r') as fd:
             layers = yaml.load(fd, Loader=yaml.SafeLoader)
