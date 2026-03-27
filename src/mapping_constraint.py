@@ -2019,6 +2019,24 @@ class MappingExplorer_mapping_constraint:
                 # 确实需要向上取整的情况（如1.1 → 2）
                 return int(np.ceil(x_rounded))
 
+        def _find_largest_divisor(dimension_size, max_block_size):
+            """
+            寻找 dimension_size 的最大因数，且该因数不超过 max_block_size。
+            如果找不到（理论上不会，因为1总是因数），则返回1。
+            
+            Args:
+                dimension_size (int): 维度的总大小（如 H, W, C 等）
+                max_block_size (float/int): 优化器给出的分块上限（可能带小数）
+            """
+            max_block_size = int(max_block_size)
+            if max_block_size <= 0: return 1
+            
+            # 从 max_block_size 向下遍历到 1，找到第一个能整除 dimension_size 的数
+            # 这样能保证分块尽可能大（利用局部性），同时正好整除维度
+            for i in range(max_block_size, 0, -1):
+                if dimension_size % i == 0:
+                    return i
+            return 1
         
         spatial_tiles_solution = solutions[0]
         temporal_tiles_solution = solutions[1]
@@ -2028,21 +2046,41 @@ class MappingExplorer_mapping_constraint:
         
         spatial_tiles_list = []
         temporal_tiles_list = []
-        datas = []
+        # 遍历每一个解（对应不同的层或问题）
         for i in range(len(solutions[0])):
-            tile_matrix = np.array(temporal_tiles_solution[i])
-            # 用vectorize实现批量处理（效率较高）
-            safe_ceil_vec = np.vectorize(safe_ceil)
-            tile_matrix_int = safe_ceil_vec(tile_matrix).astype(int)
-            temporal_tiles_list.append(tile_matrix_int)
-            tile_matrix = np.array(spatial_tiles_solution[i])
-            # 用vectorize实现批量处理（效率较高）
-            safe_ceil_vec = np.vectorize(safe_ceil)
-            tile_matrix_int = safe_ceil_vec(tile_matrix).astype(int)
-            spatial_tiles_list.append(tile_matrix_int)
+            current_dims = ["R", "S", "P", "Q", "C", "K", "H", "N"]  # 假设维度顺序固定，实际使用时可能需要根据问题动态确定
             
-            # spatial_tiles_list.append(np.ceil(spatial_tiles_solution[i]).astype(int))
-            # temporal_tiles_list.append(np.ceil(temporal_tiles_solution[i]).astype(int))
+            # --- 处理 Temporal Tiles ---
+            tile_matrix = np.array(temporal_tiles_solution[i])
+            temporal_tiles_int = np.zeros_like(tile_matrix, dtype=int)
+            
+            # 遍历矩阵的每个元素 (row, col)
+            for r in range(tile_matrix.shape[0]):
+                for c in range(tile_matrix.shape[1]):
+                    dim_name = current_dims[c] # 获取列对应的维度名
+                    dim_size = self.problems_list[i]['problem']['instance'][dim_name] # 获取该维度的实际大小
+                    block_val = tile_matrix[r, c] # 优化器给出的分块值
+                    
+                    # 使用新函数寻找最接近的因数
+                    # 注意：这里假设 temporal 也是受维度大小限制的。
+                    # 如果 temporal 不需要整除维度（例如某些循环展开），可以保留原来的 safe_ceil
+                    temporal_tiles_int[r, c] = _find_largest_divisor(dim_size, block_val)
+            
+            temporal_tiles_list.append(temporal_tiles_int)
+
+            # --- 处理 Spatial Tiles ---
+            tile_matrix = np.array(spatial_tiles_solution[i])
+            spatial_tiles_int = np.zeros_like(tile_matrix, dtype=int)
+            
+            for r in range(tile_matrix.shape[0]):
+                for c in range(tile_matrix.shape[1]):
+                    dim_name = current_dims[c]
+                    dim_size = self.problems_list[i]['problem']['instance'][dim_name]
+                    block_val = tile_matrix[r, c]
+                    
+                    spatial_tiles_int[r, c] = _find_largest_divisor(dim_size, block_val)
+            
+            spatial_tiles_list.append(spatial_tiles_int)
         
         config = min_hardware_config(spatial_tiles_list, temporal_tiles_list)
         
