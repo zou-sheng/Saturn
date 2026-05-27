@@ -22,7 +22,7 @@ ACCELERATORS=(
 )
 
 # 3. 输出根目录（所有加速器+模型的日志/时间记录）
-OUTPUT_ROOT="./no_constraint_opt/dnn_batch_results"
+OUTPUT_ROOT="./no_obj_guide/dnn_batch_results"
 
 # 4. 总时间统计文件（记录所有加速器+模型的运行数据）
 GLOBAL_TIME_LOG="${OUTPUT_ROOT}/dnn_global_run_summary.log"

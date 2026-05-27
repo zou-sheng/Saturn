@@ -1156,10 +1156,10 @@ class MappingExplorer:
             prob += spatial_capacity[3] <= 0
             prob += spatial_capacity[3] >= 0
 
-            prob += spatial_capacity[1] + spatial_capacity[2]  <= 14
+            prob += spatial_capacity[1] + spatial_capacity[2]  <= 10
 
             # 正方形阵列
-            prob += spatial_capacity[2] == spatial_capacity[1]
+            # prob += spatial_capacity[2] == spatial_capacity[1]
             # prob += spatial_capacity[2] == math.log2(112)
         
         elif self.accl_name == 'NEW':

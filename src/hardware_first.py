@@ -148,7 +148,8 @@ class HardwareFirstSearch:
             self.optim_dims = {
                 0: {"name": "Scratchpad", "attr": "entries", "min": 512, "max": 3584, "slice_num": 24, "default": 2048},
                 1: {"name": "Accumulator", "attr": "entries", "min": 128, "max": 1920, "slice_num": 28, "default": 1024},
-                2: {"name": "Registers", "attr": "instances", "min": 512, "max": 4096, "slice_num": 14, "default": 1024}
+                # 2: {"name": "Registers", "attr": "instances", "min": 512, "max": 1024, "slice_num": 16, "default": 1024}
+                # 2: {"name": "Registers", "attr": "instances", "min": 512, "max": 1024, "slice_num": 14, "default": 1024}
             }
             
             # --------------------------
@@ -157,7 +158,8 @@ class HardwareFirstSearch:
             self.syn_instances = {"LMAC": "Registers"}  # 原PEWeightRegs→Registers
             self.keep_instances = {
                 "Scratchpad": 1,
-                "Accumulator": 64,
+                "Accumulator": 32,
+                "Registers": 1024
             }
         # --------------------------
         # 可优化维度总数
