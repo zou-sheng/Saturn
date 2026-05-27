@@ -8,11 +8,12 @@ DNN_MODELS=(
     # "llama2_13B"
     # "llama2_34B"
     # "bert"
-    "vgg16"
-    "resnet50"
+    # "vgg16"
+    # "resnet50"
     # "alexnet"
-    "retinanet"
-    "unet"
+    # "retinanet"
+    # "unet"
+    "mm"
 )
 
 # 2. 定义需要自动运行的加速器列表（Simba + Gemmini）
