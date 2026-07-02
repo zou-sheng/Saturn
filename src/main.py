@@ -10,6 +10,7 @@ from mapping_constraint import MappingExplorer_mapping_constraint
 from datetime import datetime
 import json
 from hardware_first import HardwareFirstSearch
+from Hasco import HardwareFirstSearch
 from mapping_first import mapping_first_search
 
 def main():
@@ -244,6 +245,10 @@ def main():
             ME = MappingExplorer_mapping_constraint(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, expanded_scope, cluster_num, solver=solver, all_DNN=all_DNN)
             print(opt.population)
             chkpt = ME.run(num_population=opt.population, num_generations=opt.epochs)
+        elif search_mode == "HASCO":
+            HS = HardwareFirstSearch(problems_list, accelerator_dir, accelerator, mapper, type, version, report_dir, opt.optim_obj, all_DNN=all_DNN)
+            print(opt.population)
+            chkpt = HS.run()
     else:
         with open(os.path.join(benchmark_dir, '{}_workload/layers.yaml'.format(workload)), 'r') as fd:
             layers = yaml.load(fd, Loader=yaml.SafeLoader)
