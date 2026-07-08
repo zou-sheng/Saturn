@@ -23,7 +23,7 @@ def extract_value_from_file(file_path):
 
 def main():
     # 配置参数
-    main_folder = "./report/Saturn/Simba/obj_EDP/vgg16_input1_all_DNN"  # 主文件夹路径
+    main_folder = "./report/UF/Saturn/Gemmini/obj_EDP/resnet50_1_input1_all_DNN"  # 主文件夹路径
     # main_folder = "./fame_report/arch_Simba_v1/obj_edp/deepbench_input1"  # 主文件夹路径
     target_file = "timeloop-model.stats.txt"  # 目标文件名
     output_excel = "extracted_cycles.xlsx"  # 输出Excel文件名

@@ -1,0 +1,34 @@
+arch:
+  arithmetic:
+    instances: 1024
+    word-bits: 8
+  storage:
+  - cluster-size: 64
+    entries: 1
+    instances: 1024
+    name: Registers
+    num-banks: 8
+    num-ports: 2
+    word-bits: 8
+  - cluster-size: 1
+    entries: 1152
+    instances: 64
+    name: Accumulator
+    network-word-bits: 16
+    num-banks: 2
+    num-ports: 2
+    word-bits: 24
+  - block-size: 4
+    entries: 3584
+    instances: 1
+    name: Scratchpad
+    num-banks: 8
+    num-ports: 1
+    word-bits: 8
+  - bandwidth: 1
+    block-size: 64
+    instances: 1
+    name: DRAM
+    technology: DRAM
+    word-bits: 8
+    shared_bandwidth: 16

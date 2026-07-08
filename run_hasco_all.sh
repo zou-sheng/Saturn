@@ -4,16 +4,16 @@ set -euo pipefail  # 严格模式：未定义变量报错、管道失败报错�
 # ===================== 核心配置（按需修改）=====================
 # 1. 定义8个DNN模型名称
 DNN_MODELS=(
-    "llama2_7B"
-    "llama2_13B"
-    "llama2_34B"
-    "bert"
-    "vgg16"
-    "resnet50"
-    "alexnet"
-    "retinanet"
-    "unet"
-    # "mm"
+    # "llama2_7B"
+    # "llama2_13B"
+    # "llama2_34B"
+    # "bert"
+    # "vgg16"
+    # "resnet50_1"
+    # "alexnet"
+    # "retinanet"
+    # "unet"
+    "mm"
 )
 
 # 2. 定义需要自动运行的加速器列表（Simba + Gemmini）
@@ -23,7 +23,7 @@ ACCELERATORS=(
 )
 
 # 3. 输出根目录（所有加速器+模型的日志/时间记录）
-OUTPUT_ROOT="./HASCO/dnn_batch_results"
+OUTPUT_ROOT="./HASCO_Gemmini/dnn_batch_results"
 
 # 4. 总时间统计文件（记录所有加速器+模型的运行数据）
 GLOBAL_TIME_LOG="${OUTPUT_ROOT}/dnn_global_run_summary.log"

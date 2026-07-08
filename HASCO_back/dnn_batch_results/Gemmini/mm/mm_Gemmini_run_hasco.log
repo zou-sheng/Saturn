@@ -1,0 +1,1100 @@
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 16, 128, 128] [inf, 8196, 4096, 1]
+[1, 16, 8, 1]
+20
+begin to init point 1
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2176, 1088, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2176, 1088, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.36e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.88e-08 |
+|    std                  | 1        |
+|    value_loss           | 2.72e+23 |
+--------------------------------------
+训练完成，最佳奖励: -137568621.68315902
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2176, 1088, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-137568621.68315902], [[-138000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1088 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=5 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4 Q=1 C=1 K=17 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=820 K=241 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([255182848.0], [539098.23]))
+最终结果: 总周期 255182848.00, 总能量 539098.23, EDP 137568621.68
+collect X: [12.94120185 14.09395628], objs: [539098.23, 255182848.0, 0]
+begin to init point 2
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3456, 1664, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3456, 1664, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 11 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.43e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 9.24e-09 |
+|    std                  | 1        |
+|    value_loss           | 2.86e+23 |
+--------------------------------------
+训练完成，最佳奖励: -89320400.32162815
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3456, 1664, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-89320400.32162815], [[-89300000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=6 K=2 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=683 K=128 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([136380928.0], [654933.22]))
+最终结果: 总周期 136380928.00, 总能量 654933.22, EDP 89320400.32
+collect X: [22.1033068  23.98073735], objs: [654933.22, 136380928.0, 0]
+begin to init point 3
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1152, 1600, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1152, 1600, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 11 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 2.52e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -1.12e-08 |
+|    std                  | 1         |
+|    value_loss           | 5.05e+23  |
+---------------------------------------
+训练完成，最佳奖励: -146547582.89670143
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1152, 1600, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-146547582.89670143], [[-147000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=6 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=64 K=43 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([179306496.0], [817302.14]))
+最终结果: 总周期 179306496.00, 总能量 817302.14, EDP 146547582.90
+collect X: [ 4.16985647 22.37132172], objs: [817302.14, 179306496.0, 0]
+begin to init point 4
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2944, 256, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2944, 256, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 4.71e+22 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.03e-08 |
+|    std                  | 1        |
+|    value_loss           | 9.41e+22 |
+--------------------------------------
+训练完成，最佳奖励: -150076745.25548545
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2944, 256, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-150076745.25548545], [[-150000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=46 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=90 K=4 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([192937984.0], [777849.66]))
+最终结果: 总周期 192937984.00, 总能量 777849.66, EDP 150076745.26
+collect X: [18.14818472  1.07121276], objs: [777849.66, 192937984.0, 0]
+begin to init point 5
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 832, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 832, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 7         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 1.4e+23   |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -4.41e-09 |
+|    std                  | 1         |
+|    value_loss           | 2.8e+23   |
+---------------------------------------
+训练完成，最佳奖励: -122812329.35092223
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 832, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-122812329.35092223], [[-123000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=13 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=64 K=20 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([155189248.0], [791371.38]))
+最终结果: 总周期 155189248.00, 总能量 791371.38, EDP 122812329.35
+collect X: [ 9.44678497 10.61894478], objs: [791371.38, 155189248.0, 0]
+After init, the sample size is: 5
+choose index: 568
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 192, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 192, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.48e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 2.05e-08 |
+|    std                  | 1        |
+|    value_loss           | 2.97e+23 |
+--------------------------------------
+训练完成，最佳奖励: -442802320.8502886
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 192, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-442802320.8502886], [[-443000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=2 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=2048 Q=1 C=64 K=256 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([402653184.0], [1099711.46]))
+最终结果: 总周期 402653184.00, 总能量 1099711.46, EDP 442802320.85
+collect X: [0.36862114 0.58528479], objs: [1099711.46, 402653184.0, 0]
+Found pareto samples: 2 : [[539098.23, 255182848.0, 0], [654933.22, 136380928.0, 0]]
+Overall samples: 6
+================================
+choose index: 202
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3072, 1920, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3072, 1920, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 3.71e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -1.59e-08 |
+|    std                  | 1         |
+|    value_loss           | 7.43e+23  |
+---------------------------------------
+训练完成，最佳奖励: -247852567.05949697
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3072, 1920, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-247852567.05949697], [[-248000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=16 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=36 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=256 Q=1 C=64 K=114 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([253755392.0], [976738.13]))
+最终结果: 总周期 253755392.00, 总能量 976738.13, EDP 247852567.06
+collect X: [19.77689152 27.9277318 ], objs: [976738.13, 253755392.0, 0]
+Found pareto samples: 2 : [[539098.23, 255182848.0, 0], [654933.22, 136380928.0, 0]]
+Overall samples: 7
+================================
+choose index: 327
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 1216, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 1216, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 3e+23    |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.91e-09 |
+|    std                  | 1        |
+|    value_loss           | 6e+23    |
+--------------------------------------
+训练完成，最佳奖励: -113225728.19857919
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 1216, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-113225728.19857919], [[-113000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=7 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1216 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4 Q=1 C=1 K=19 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=586 K=216 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([229316096.0], [493753.95]))
+最终结果: 总周期 229316096.00, 总能量 493753.95, EDP 113225728.20
+collect X: [23.43016102 16.05014546], objs: [493753.95, 229316096.0, 0]
+Found pareto samples: 2 : [[654933.22, 136380928.0, 0], [493753.95, 229316096.0, 0]]
+Overall samples: 8
+================================
+choose index: 477
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3456, 1408, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3456, 1408, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 5.86e+22 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 4.89e-09 |
+|    std                  | 1        |
+|    value_loss           | 1.17e+23 |
+--------------------------------------
+训练完成，最佳奖励: -158392753.3406208
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3456, 1408, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-158392753.3406208], [[-158000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=16 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=4 Q=1 C=6 K=22 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=683 K=187 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([198277120.0], [798845.34]))
+最终结果: 总周期 198277120.00, 总能量 798845.34, EDP 158392753.34
+collect X: [22.86695195 19.7180566 ], objs: [798845.34, 198277120.0, 0]
+Found pareto samples: 2 : [[654933.22, 136380928.0, 0], [493753.95, 229316096.0, 0]]
+Overall samples: 9
+================================
+choose index: 77
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1920, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1920, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 7        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.96e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.1e-08  |
+|    std                  | 1        |
+|    value_loss           | 3.91e+23 |
+--------------------------------------
+训练完成，最佳奖励: -85378868.96259071
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1920, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-85378868.96259071], [[-85400000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=100 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=41 Q=1 C=1 K=2 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=4096 K=128 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([136316928.0], [626326.24]))
+最终结果: 总周期 136316928.00, 总能量 626326.24, EDP 85378868.96
+collect X: [ 0.22876437 27.75836982], objs: [626326.24, 136316928.0, 0]
+Found pareto samples: 2 : [[493753.95, 229316096.0, 0], [626326.24, 136316928.0, 0]]
+Overall samples: 10
+================================
+choose index: 979
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 960, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 960, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 1.85e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -4.35e-09 |
+|    std                  | 1         |
+|    value_loss           | 3.71e+23  |
+---------------------------------------
+训练完成，最佳奖励: -117162338.16702975
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 960, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-117162338.16702975], [[-117000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=49 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=64 K=6 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([140509184.0], [833841.14]))
+最终结果: 总周期 140509184.00, 总能量 833841.14, EDP 117162338.17
+collect X: [23.71802613 12.51109312], objs: [833841.14, 140509184.0, 0]
+Found pareto samples: 2 : [[493753.95, 229316096.0, 0], [626326.24, 136316928.0, 0]]
+Overall samples: 11
+================================
+choose index: 182
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 384, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 384, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.75e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 4.41e-09 |
+|    std                  | 1        |
+|    value_loss           | 3.49e+23 |
+--------------------------------------
+训练完成，最佳奖励: -35566594.1889024
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 384, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-35566594.1889024], [[-35600000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=14 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=19 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([106954752.0], [332538.7]))
+最终结果: 总周期 106954752.00, 总能量 332538.70, EDP 35566594.19
+collect X: [23.95770233  3.96363945], objs: [332538.7, 106954752.0, 0]
+Found pareto samples: 1 : [[332538.7, 106954752.0, 0]]
+Overall samples: 12
+================================
+choose index: 438
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1024, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1024, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 1.98e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -3.21e-08 |
+|    std                  | 1         |
+|    value_loss           | 3.95e+23  |
+---------------------------------------
+训练完成，最佳奖励: -219756572.75719678
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1024, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-219756572.75719678], [[-220000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=4096 K=256 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([270532608.0], [812310.85]))
+最终结果: 总周期 270532608.00, 总能量 812310.85, EDP 219756572.76
+collect X: [8.74276089e-03 1.38305272e+01], objs: [812310.85, 270532608.0, 0]
+Found pareto samples: 1 : [[332538.7, 106954752.0, 0]]
+Overall samples: 13
+================================
+choose index: 635
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 448, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 448, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.2e+23  |
+|    n_updates            | 10       |
+|    policy_gradient_loss | -2.9e-08 |
+|    std                  | 1        |
+|    value_loss           | 2.4e+23  |
+--------------------------------------
+训练完成，最佳奖励: -35566594.1889024
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 448, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-35566594.1889024], [[-35600000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=14 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=19 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([106954752.0], [332538.7]))
+最终结果: 总周期 106954752.00, 总能量 332538.70, EDP 35566594.19
+collect X: [23.7116487  4.8299633], objs: [332538.7, 106954752.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 14
+================================
+choose index: 473
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1664, 256, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1664, 256, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 1.36e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -3.03e-08 |
+|    std                  | 1         |
+|    value_loss           | 2.72e+23  |
+---------------------------------------
+训练完成，最佳奖励: -509624466.25538045
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1664, 256, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-509624466.25538045], [[-510000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=256 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=4 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=64 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([1073741824.0], [474624.77]))
+最终结果: 总周期 1073741824.00, 总能量 474624.77, EDP 509624466.26
+collect X: [8.93319175 1.7944544 ], objs: [474624.77, 1073741824.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 15
+================================
+choose index: 582
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 1920, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 1920, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.81e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.07e-08 |
+|    std                  | 1        |
+|    value_loss           | 3.61e+23 |
+--------------------------------------
+训练完成，最佳奖励: -219756572.75719678
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 1920, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-219756572.75719678], [[-220000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=4096 K=256 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([270532608.0], [812310.85]))
+最终结果: 总周期 270532608.00, 总能量 812310.85, EDP 219756572.76
+collect X: [ 9.96170107 27.66167799], objs: [812310.85, 270532608.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 16
+================================
+choose index: 426
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2560, 1280, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2560, 1280, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 1.76e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -7.15e-09 |
+|    std                  | 1         |
+|    value_loss           | 3.52e+23  |
+---------------------------------------
+训练完成，最佳奖励: -42453130.658447355
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2560, 1280, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-42453130.658447355], [[-42500000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=10 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=26 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([121634816.0], [349021.21]))
+最终结果: 总周期 121634816.00, 总能量 349021.21, EDP 42453130.66
+collect X: [15.26721195 17.35079582], objs: [349021.21, 121634816.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 17
+================================
+choose index: 926
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2304, 1472, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2304, 1472, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 7        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.85e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | -4.4e-08 |
+|    std                  | 1        |
+|    value_loss           | 3.7e+23  |
+--------------------------------------
+训练完成，最佳奖励: -45717927.77674751
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2304, 1472, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-45717927.77674751], [[-45700000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=9 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=29 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([127926272.0], [357377.16]))
+最终结果: 总周期 127926272.00, 总能量 357377.16, EDP 45717927.78
+collect X: [13.24195433 20.90786414], objs: [357377.16, 127926272.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 18
+================================
+choose index: 0
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2816, 1472, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2816, 1472, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 1.72e+23  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -1.61e-09 |
+|    std                  | 1         |
+|    value_loss           | 3.44e+23  |
+---------------------------------------
+训练完成，最佳奖励: -158633651.38120702
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2816, 1472, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-158633651.38120702], [[-159000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=44 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=94 K=4 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([201326592.0], [787941.87]))
+最终结果: 总周期 201326592.00, 总能量 787941.87, EDP 158633651.38
+collect X: [17.14872034 20.28007535], objs: [787941.87, 201326592.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 19
+================================
+choose index: 356
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3200, 640, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3200, 640, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 3.88e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.87e-08 |
+|    std                  | 1        |
+|    value_loss           | 7.76e+23 |
+--------------------------------------
+训练完成，最佳奖励: -36436218.23741952
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3200, 640, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-36436218.23741952], [[-36400000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=13 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=20 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([109051904.0], [334118.13]))
+最终结果: 总周期 109051904.00, 总能量 334118.13, EDP 36436218.24
+collect X: [20.07785328  7.27241578], objs: [334118.13, 109051904.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 20
+================================
+choose index: 28
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 1408, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 1408, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 3  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.43e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 5.25e-09 |
+|    std                  | 1        |
+|    value_loss           | 2.87e+23 |
+--------------------------------------
+训练完成，最佳奖励: -55112579.33217792
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 1792, 1408, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-55112579.33217792], [[-55100000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=16 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=7 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=37 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([144703488.0], [380865.59]))
+最终结果: 总周期 144703488.00, 总能量 380865.59, EDP 55112579.33
+collect X: [ 9.76961343 19.08274993], objs: [380865.59, 144703488.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 21
+================================
+choose index: 877
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1600, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1600, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+---------------------------------------
+| time/                   |           |
+|    fps                  | 12        |
+|    iterations           | 2         |
+|    time_elapsed         | 8         |
+|    total_timesteps      | 100       |
+| train/                  |           |
+|    approx_kl            | 0.0       |
+|    clip_fraction        | 0         |
+|    clip_range           | 0.2       |
+|    entropy_loss         | -90.8     |
+|    explained_variance   | 0         |
+|    learning_rate        | 0.001     |
+|    loss                 | 9.44e+22  |
+|    n_updates            | 10        |
+|    policy_gradient_loss | -7.57e-09 |
+|    std                  | 1         |
+|    value_loss           | 1.89e+23  |
+---------------------------------------
+训练完成，最佳奖励: -88815508.86174719
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 640, 1600, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-88815508.86174719], [[-88800000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=2 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=64 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=4096 K=128 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([136314880.0], [651546.69]))
+最终结果: 总周期 136314880.00, 总能量 651546.69, EDP 88815508.86
+collect X: [4.79837181e-03 2.26875464e+01], objs: [651546.69, 136314880.0, 0]
+Found pareto samples: 2 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0]]
+Overall samples: 22
+================================
+choose index: 653
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 512, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 512, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.61e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 1.64e-08 |
+|    std                  | 1        |
+|    value_loss           | 3.22e+23 |
+--------------------------------------
+训练完成，最佳奖励: -54614594.92405248
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 3584, 512, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-54614594.92405248], [[-54600000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=32 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=64 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=2 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=32 K=8 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([75497472.0], [723396.34]))
+最终结果: 总周期 75497472.00, 总能量 723396.34, EDP 54614594.92
+collect X: [23.70224165  5.84571309], objs: [723396.34, 75497472.0, 0]
+Found pareto samples: 3 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0], [723396.34, 75497472.0, 0]]
+Overall samples: 23
+================================
+choose index: 798
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2944, 896, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2944, 896, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 7        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 2.04e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 2.6e-08  |
+|    std                  | 1        |
+|    value_loss           | 4.08e+23 |
+--------------------------------------
+训练完成，最佳奖励: -196749194.02995712
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2944, 896, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-196749194.02995712], [[-197000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=16 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=46 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=256 Q=1 C=90 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([255852544.0], [768994.48]))
+最终结果: 总周期 255852544.00, 总能量 768994.48, EDP 196749194.03
+collect X: [18.87803381 11.54259893], objs: [768994.48, 255852544.0, 0]
+Found pareto samples: 3 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0], [723396.34, 75497472.0, 0]]
+Overall samples: 24
+================================
+choose index: 623
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2816, 448, 1]
+[1, 64, 16, 1]
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2816, 448, 1]
+[1, 64, 16, 1]
+Using cpu device
+开始强化学习训练...
+---------------------------
+| time/              |    |
+|    fps             | 12 |
+|    iterations      | 1  |
+|    time_elapsed    | 4  |
+|    total_timesteps | 50 |
+---------------------------
+--------------------------------------
+| time/                   |          |
+|    fps                  | 12       |
+|    iterations           | 2        |
+|    time_elapsed         | 8        |
+|    total_timesteps      | 100      |
+| train/                  |          |
+|    approx_kl            | 0.0      |
+|    clip_fraction        | 0        |
+|    clip_range           | 0.2      |
+|    entropy_loss         | -90.8    |
+|    explained_variance   | 0        |
+|    learning_rate        | 0.001    |
+|    loss                 | 1.69e+23 |
+|    n_updates            | 10       |
+|    policy_gradient_loss | 6.85e-09 |
+|    std                  | 1        |
+|    value_loss           | 3.38e+23 |
+--------------------------------------
+训练完成，最佳奖励: -158633651.38120702
+生成最终映射与报告...
+['DRAM', 'Scratchpad', 'Accumulator', 'Registers'] [1, 1, 64, 1024, 1024] [inf, 2816, 448, 1]
+[1, 64, 16, 1]
+测试最佳配置奖励： ([-158633651.38120702], [[-159000000.0]], [{'mapping': [{'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Registers', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=16 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=44 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Accumulator', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=64 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'spatial'}, {'factors': 'R=1 S=1 P=1 Q=1 C=1 K=1 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'Scratchpad', 'type': 'temporal'}, {'factors': 'R=1 S=1 P=4096 Q=1 C=94 K=4 H=1 N=1', 'permutation': 'RSPQCKHN', 'target': 'DRAM', 'type': 'temporal'}, {'keep': ['Weights'], 'bypass': ['Inputs', 'Outputs'], 'target': 'Registers', 'type': 'datatype'}, {'keep': ['Outputs'], 'bypass': ['Weights', 'Inputs'], 'target': 'Accumulator', 'type': 'datatype'}, {'keep': ['Inputs', 'Weights'], 'bypass': ['Outputs'], 'target': 'Scratchpad', 'type': 'datatype'}]}], ([201326592.0], [787941.87]))
+最终结果: 总周期 201326592.00, 总能量 787941.87, EDP 158633651.38
+collect X: [17.56436601  4.99589078], objs: [787941.87, 201326592.0, 0]
+Found pareto samples: 3 : [[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0], [723396.34, 75497472.0, 0]]
+Overall samples: 25
+================================
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Optimization reach end after 25 samples!
+Found pareto samples: 3
+[[332538.7, 106954752.0, 0], [332538.7, 106954752.0, 0], [723396.34, 75497472.0, 0]]
+MOBO takes 245.22827053070068 seconds
+
+==================================================
+🚀 MOBO 优化完成 - 帕累托最优解分析：
+帕累托解总数：3
+原始总采样点数：25
+==================================================
+✅ 成功定位：该最优点是原始 60 个采样点中的第 [11] 个 (0-based)。
+   即：这是 BO 启动后第 12 次调用 __call__ 产生的结果。
+
+🏆 【特定目标最优点】(前两个参数乘积最小)
+   🆔 原始采样点索引：No. 11 (共 60 个点)
+   📉 最小乘积值 (x[0]*x[1]): 94.959694
+   🔢 完整输入参数 X: [23.957702  3.963639]
+   🎯 对应目标值 Objs:  [3.32538700e+05 1.06954752e+08 0.00000000e+00]
+
+--- 所有 3 个帕累托解详情 (含原始索引映射) ---
+帕累托ID    | 原始ID     | Prod         | X[:3] (高精度)                         | Objs                      | 标记
+----------------------------------------------------------------------------------------------------
+[0     ] | [11    ] | 94.959694    | [23.957702  3.963639]               | [3.3254e+05 1.0695e+08 0.0000e+00] | 🏆 BEST
+[1     ] | [13    ] | 114.526393   | [23.711649  4.829963]               | [3.3254e+05 1.0695e+08 0.0000e+00] | 
+[2     ] | [22    ] | 138.556504   | [23.702242  5.845713]               | [  723396.34 75497472.          0.  ] | 
+
+📊 全体帕累托解目标值统计：
+目标 1 - 最小值：332538.7000，平均值：462824.5800
+目标 2 - 最小值：75497472.0000，平均值：96468992.0000
+目标 3 - 最小值：0.0000，平均值：0.0000
+==================================================
+

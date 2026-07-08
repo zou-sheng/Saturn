@@ -442,6 +442,18 @@ class MappingExplorer:
         # 定义目标函数：矩阵元素的加权和
         objective = 0
         for k in range(len(dimension_list)):
+            # prob += spatial_tiles[k][1][0] == 0
+            # prob += spatial_tiles[k][1][1] == 0
+            # prob += spatial_tiles[k][1][2] == 0
+            # prob += spatial_tiles[k][1][3] == 0
+            # prob += spatial_tiles[k][1][6] == 0
+            # prob += spatial_tiles[k][1][7] == 0
+            # prob += spatial_tiles[k][2][0] == 0
+            # prob += spatial_tiles[k][2][1] == 0
+            # prob += spatial_tiles[k][2][2] == 0
+            # prob += spatial_tiles[k][2][3] == 0
+            # prob += spatial_tiles[k][2][6] == 0
+            # prob += spatial_tiles[k][2][7] == 0
             for r in range(rows):
                 for c in range(cols):
                     objective += spatial_tiles[k][r][c] * spatial_tiles_weight[k][r][c]
@@ -467,7 +479,7 @@ class MappingExplorer:
                 
                 prob += buf_capacity <= len(tensors_list)*(math.log2(self.buffer_capacity[r]) - math.log2(len(tensors_list)))
 
-            
+
         # 并行容量约束
         for k in range(len(dimension_list)):
             for r in range(rows):
@@ -1378,6 +1390,7 @@ def run_rl(self, total_timesteps=400, n_envs=4, learning_rate=1e-3, fitness_obj=
     mapping_list, _, arch = explorer_final.generate_mapping_and_config_for_all_DNN(
     explorer_final.tensor_dimensions_list, best_config)
 
+    out_mapping = []
     # 按层生成映射文件
     raw_metrics = {"cycles": [], "energy": [], "utilization": [], "GFLOPs": [], "EDP": []}
     for i in range(len(mapping_list)):
@@ -1394,6 +1407,7 @@ def run_rl(self, total_timesteps=400, n_envs=4, learning_rate=1e-3, fitness_obj=
             mapping.target_list, mapping.type_list, mapping.bypass_list,
             remainders, outermost_idx
         )
+        out_mapping.append(temp_mapping)
         report_dir = os.path.join(self.report_dir, f'layer-{i}')
         if not os.path.exists(report_dir):
             os.makedirs(report_dir)
@@ -1412,6 +1426,9 @@ def run_rl(self, total_timesteps=400, n_envs=4, learning_rate=1e-3, fitness_obj=
     total_energy = sum(raw_metrics["energy"])
     print("各层 cycles:", raw_metrics["cycles"])
     print("各层 energy:", raw_metrics["energy"])
+    print("各层的mapping")
+    for i in out_mapping:
+        print(i)
     total_edp = total_cycles * total_energy * 1e-6
     print(f"最终结果: 总周期 {total_cycles:.2f}, 总能量 {total_energy:.2f}, EDP {total_edp:.2f}")
     return total_cycles, total_energy

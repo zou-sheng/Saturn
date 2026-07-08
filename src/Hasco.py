@@ -158,8 +158,8 @@ class HardwareFirstSearch:
             self.syn_instances = {"LMAC": "Registers"}  # 原PEWeightRegs→Registers
             self.keep_instances = {
                 "Scratchpad": 1,
-                "Accumulator": 32,
-                "Registers": 1024
+                "Accumulator": 128,
+                "Registers": 128*128
             }
         # --------------------------
         # 可优化维度总数
@@ -404,14 +404,14 @@ class HardwareFirstSearch:
             new_arch = {
                 "arch": {
                     "arithmetic": {
-                        "instances": 1024,  # 默认值，会被候选参数更新
+                        "instances": 16384,  # 默认值，会被候选参数更新
                         "word-bits": 8
                     },
                     "storage": [
                         {
                             "cluster-size": 64,
                             "entries": 1,
-                            "instances": 1024,  # 默认值
+                            "instances": 16384,  # 默认值
                             "name": "Registers",
                             "num-banks": 8,
                             "num-ports": 2,
@@ -420,7 +420,7 @@ class HardwareFirstSearch:
                         {
                             "cluster-size": 1,
                             "entries": 3072,  # 默认值
-                            "instances": 64,
+                            "instances": 128,
                             "name": "Accumulator",
                             "network-word-bits": 16,
                             "num-banks": 2,
