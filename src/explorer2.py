@@ -1134,7 +1134,7 @@ class MappingExplorer:
             prob += buffer_capacity[0] <= 0
             prob += buffer_capacity[0] >= 0
             # Accumulator
-            prob += buffer_capacity[1] <= 14
+            prob += buffer_capacity[1] <= 18
             prob += buffer_capacity[1] >= 10
             # Scratchpad
             prob += buffer_capacity[2] <= 20
@@ -1147,36 +1147,36 @@ class MappingExplorer:
             prob += spatial_capacity[0] <= 0
             prob += spatial_capacity[0] >= 0
             # Accumulator
-            prob += spatial_capacity[1] <= 4
+            prob += spatial_capacity[1] <= 7
             prob += spatial_capacity[1] >= 2
             # Scratchpad
-            prob += spatial_capacity[2] <= 4
+            prob += spatial_capacity[2] <= 7
             prob += spatial_capacity[2] >= 2
             # DRAM
             prob += spatial_capacity[3] <= 0
             prob += spatial_capacity[3] >= 0
 
-            prob += spatial_capacity[1] + spatial_capacity[2]  <= 8
+            # prob += spatial_capacity[1] + spatial_capacity[2]  <= 8
 
             # 正方形阵列
             # prob += spatial_capacity[2] == spatial_capacity[1]
             # prob += spatial_capacity[2] == math.log2(112)
 
-            for k in range(len(dimension_list)):
-                prob += spatial_tiles[k][1][0] == 0
-                prob += spatial_tiles[k][1][1] == 0
-                prob += spatial_tiles[k][1][2] == 0
-                prob += spatial_tiles[k][1][3] == 0
-                prob += spatial_tiles[k][1][5] == 0
-                prob += spatial_tiles[k][1][6] == 0
-                prob += spatial_tiles[k][1][7] == 0
-                prob += spatial_tiles[k][2][0] == 0
-                prob += spatial_tiles[k][2][1] == 0
-                prob += spatial_tiles[k][2][2] == 0
-                prob += spatial_tiles[k][2][3] == 0
-                prob += spatial_tiles[k][2][4] == 0
-                prob += spatial_tiles[k][2][6] == 0
-                prob += spatial_tiles[k][2][7] == 0
+            # for k in range(len(dimension_list)):
+            #     prob += spatial_tiles[k][1][0] == 0
+            #     prob += spatial_tiles[k][1][1] == 0
+            #     prob += spatial_tiles[k][1][2] == 0
+            #     prob += spatial_tiles[k][1][3] == 0
+            #     prob += spatial_tiles[k][1][5] == 0
+            #     prob += spatial_tiles[k][1][6] == 0
+            #     prob += spatial_tiles[k][1][7] == 0
+            #     prob += spatial_tiles[k][2][0] == 0
+            #     prob += spatial_tiles[k][2][1] == 0
+            #     prob += spatial_tiles[k][2][2] == 0
+            #     prob += spatial_tiles[k][2][3] == 0
+            #     prob += spatial_tiles[k][2][4] == 0
+            #     prob += spatial_tiles[k][2][6] == 0
+            #     prob += spatial_tiles[k][2][7] == 0
 
         
         elif self.accl_name == 'NEW':

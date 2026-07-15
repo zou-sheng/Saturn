@@ -7,7 +7,7 @@ Level 0
     SPECS
     -----
     Word bits             : 8
-    Instances             : 34992 (34992*1)
+    Instances             : 27864 (27864*1)
     Compute energy        : 0.25 pJ
 
     STATS
@@ -25,16 +25,16 @@ Level 1
     SPECS
     -----
         Technology                      : SRAM
-        Size                            : 2
+        Size                            : 1
         Word bits                       : 8
         Block size                      : 1
         Cluster size                    : 1
-        Instances                       : 34992 (34992*1)
+        Instances                       : 27864 (27864*1)
         Shared bandwidth                : -
         Read bandwidth                  : -
         Write bandwidth                 : -
         Multiple buffering              : 1.00
-        Effective size                  : 2
+        Effective size                  : 1
         Min utilization                 : 0.00
         Vector access energy            : 0.49 pJ
         Vector access energy source     : PAT
@@ -50,7 +50,7 @@ Level 1
     Bandwidth throttling : 1.00
     Weights:
         Partition size                           : 8
-        Utilized capacity                        : 2
+        Utilized capacity                        : 1
         Utilized instances (max)                 : 16384
         Utilized clusters (max)                  : 16384
         Scalar reads (per-instance)              : 6272
@@ -59,8 +59,8 @@ Level 1
         Temporal reductions (per-instance)       : 0
         Address generations (per-cluster)        : 6280
         Energy (per-scalar-access)               : 0.49 pJ
-        Energy (per-instance)                    : 3061.41 pJ
-        Energy (total)                           : 50158202.21 pJ
+        Energy (per-instance)                    : 3061.26 pJ
+        Energy (total)                           : 50155677.59 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
@@ -80,18 +80,18 @@ Level 2
     SPECS
     -----
         Technology                      : SRAM
-        Size                            : 2016
+        Size                            : 1568
         Word bits                       : 32
         Block size                      : 16
         Cluster size                    : 1
-        Instances                       : 162 (162*1)
+        Instances                       : 216 (216*1)
         Shared bandwidth                : -
         Read bandwidth                  : -
         Write bandwidth                 : -
         Multiple buffering              : 1.00
-        Effective size                  : 2016
+        Effective size                  : 1568
         Min utilization                 : 0.00
-        Vector access energy            : 43.86 pJ
+        Vector access energy            : 41.05 pJ
         Vector access energy source     : PAT
         Per-instance-cycle leakage      : 0.00 pJ
         Instances sharing power gating  : 1.00
@@ -113,9 +113,9 @@ Level 2
         Scalar updates (per-instance)            : 6272
         Temporal reductions (per-instance)       : 4704
         Address generations (per-cluster)        : 6272
-        Energy (per-scalar-access)               : 2.74 pJ
-        Energy (per-instance)                    : 30087.48 pJ
-        Energy (total)                           : 3851197.11 pJ
+        Energy (per-scalar-access)               : 2.57 pJ
+        Energy (per-instance)                    : 28157.03 pJ
+        Energy (total)                           : 3604099.22 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
@@ -135,7 +135,7 @@ Level 3
     SPECS
     -----
         Technology                      : SRAM
-        Size                            : 323584
+        Size                            : 133120
         Word bits                       : 8
         Block size                      : 16
         Cluster size                    : 1
@@ -144,9 +144,9 @@ Level 3
         Read bandwidth                  : -
         Write bandwidth                 : -
         Multiple buffering              : 1.00
-        Effective size                  : 323584
+        Effective size                  : 133120
         Min utilization                 : 0.00
-        Vector access energy            : 134.83 pJ
+        Vector access energy            : 60.06 pJ
         Vector access energy source     : PAT
         Per-instance-cycle leakage      : 0.00 pJ
         Instances sharing power gating  : 1.00
@@ -168,9 +168,9 @@ Level 3
         Scalar updates (per-instance)            : 0
         Temporal reductions (per-instance)       : 0
         Address generations (per-cluster)        : 262144
-        Energy (per-scalar-access)               : 8.43 pJ
-        Energy (per-instance)                    : 2209123.06 pJ
-        Energy (total)                           : 2209123.06 pJ
+        Energy (per-scalar-access)               : 3.75 pJ
+        Energy (per-instance)                    : 984027.98 pJ
+        Energy (total)                           : 984027.98 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
@@ -192,9 +192,9 @@ Level 3
         Scalar updates (per-instance)            : 0
         Temporal reductions (per-instance)       : 0
         Address generations (per-cluster)        : 1204224
-        Energy (per-scalar-access)               : 8.43 pJ
-        Energy (per-instance)                    : 10148159.04 pJ
-        Energy (total)                           : 10148159.04 pJ
+        Energy (per-scalar-access)               : 3.75 pJ
+        Energy (per-instance)                    : 4520378.53 pJ
+        Energy (total)                           : 4520378.53 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
@@ -338,18 +338,18 @@ Operational Intensity Stats
 Summary Stats
 -------------
 GFLOPs (@1GHz): 4480.63
-Utilization: 6.41%
+Utilization: 8.05%
 Cycles: 45824
-Energy: 165.38 uJ
-EDP(J*cycle): 7.58e+00
+Energy: 158.27 uJ
+EDP(J*cycle): 7.25e+00
 Area: 0.00 mm^2
 
 Computes = 102760448
 fJ/Compute
     __ARITH__                   = 250.00
-    Registers                   = 488.11
-    Accumulator                 = 37.48
-    Scratchpad                  = 120.25
+    Registers                   = 488.08
+    Accumulator                 = 35.07
+    Scratchpad                  = 53.57
     DRAM                        = 713.49
-    Total                       = 1609.33
+    Total                       = 1540.21
 

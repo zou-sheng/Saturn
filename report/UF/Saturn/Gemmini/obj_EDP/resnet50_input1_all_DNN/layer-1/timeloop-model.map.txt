@@ -5,11 +5,10 @@ Scratchpad [ Weights:4096 (4096) Inputs:200704 (200704) ]
 
 Accumulator [ Outputs:3136 (3136) ] 
 -----------------------------------
-|   for P in [0:56)
-|     for C in [0:64) (Spatial-X)
-|       for Q in [0:2) (Spatial-X)
+|   for C in [0:64) (Spatial-X)
 
 Registers [ Weights:1 (1) ] 
 ---------------------------
-|         for Q in [0:28)
-|           << Compute >>
+|     for Q in [0:56)
+|       for P in [0:56)
+|         << Compute >>
