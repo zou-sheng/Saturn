@@ -19,6 +19,7 @@ import cvxpy as cp
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score, calinski_harabasz_score
 import pprint
+import json
 # from skopt import gp_minimize
 # from skopt.space import Integer
 # from skopt.utils import use_named_args
@@ -1159,7 +1160,7 @@ class MappingExplorer:
             # prob += spatial_capacity[1] + spatial_capacity[2]  <= 8
 
             # 正方形阵列
-            # prob += spatial_capacity[2] == spatial_capacity[1]
+            prob += spatial_capacity[2] == spatial_capacity[1]
             # prob += spatial_capacity[2] == math.log2(112)
 
             # for k in range(len(dimension_list)):
@@ -2999,6 +3000,7 @@ class MappingExplorer:
         # try:
         mapping_list, _, arch = self.generate_mapping_and_config_for_all_DNN(self.tensor_dimensions_list, p)
         
+        arch_str = json.dumps(arch, sort_keys=True)
         
         # 初始化存储列表（记录每层原始值，而非奖励值）
         values_list = []
@@ -3093,7 +3095,7 @@ class MappingExplorer:
         # finally:
         if os.path.exists(temp_dir):
             shutil.rmtree(temp_dir)
-        return rewards, values_list, mapping_list, a  
+        return rewards, values_list, mapping_list, a, arch_str 
     
     def thread_fun_DNN(self, p):
         original_dir = os.getcwd()
@@ -5363,6 +5365,8 @@ class MappingExplorer:
         best_buffer_temporal_weights = [np.random.randint(10, 100, size=row).astype(float) for _ in range(len(self.problems_list))]
         best_buffer_spatial_weights = [np.random.randint(10, 100, size=row).astype(float) for _ in range(len(self.problems_list))]
         no_mutation = [False for _ in range(self.cluster_num)]
+        
+        all_time_unique_archs = set()
         for g in range(num_generations):
             start_time = time.time()
             # alpha = adaptive_parameters(g, num_generations)
@@ -5401,6 +5405,9 @@ class MappingExplorer:
                 tile_value_list = [res[1] for res in results]
                 mapping_list = [res[2] for res in results]
                 a = [res[3] for res in results]
+                for res in results:
+                    if res[4] is not None: # 安全检查
+                        all_time_unique_archs.add(res[4])
                 for idx_prob in range(len(self.problems_list)):
                     current_tile_weights_scores = -float('inf')
                     current_temporal_tile_weights = None
@@ -5461,7 +5468,7 @@ class MappingExplorer:
                 #             no_mutation[i] = True
                 
                 print( "[Stage {}]Gen {}:  1st stage Reward: {}, Best reward: {}".format(stage_idx + 1, (g + 1), np.abs(prev_stage_value), np.abs(best_reward)))
-       
+                print(f"--- [Gen {g}] 历史累计探索到的不同架构总数: {len(all_time_unique_archs)} ---")
    
             elapsed_time = time.time() - start_time
             print("Generation {} 耗时: {:.3f}秒".format(g, elapsed_time))

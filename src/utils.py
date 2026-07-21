@@ -581,10 +581,14 @@ def generate_accelerator(config, hardware):
                                 {'name': 'Accumulator', 'entries': 4096, 'depth': 1024, 'width': 512, 'instances': 16, 'word-bits': 32, 'network-word-bits': 16, 'n_rdwr_ports': 2, 'n_banks': 2}, 
                                 {'name': 'Scratchpad', 'class': 'SRAM', 'entries': 8196, 'depth': 16384, 'width': 128, 'instances': 1, 'word-bits': 8, 'n_rdwr_ports': 1, 'n_banks': 4},# 'shared_bandwidth': 64}, 
                                 {'name': 'DRAM', 'technology': 'DRAM', 'instances': 1, 'word-bits': 8, 'block_size': 64, 'shared_bandwidth': 16}]}}
-
-        arch_dict['arch']['arithmetic']['instances'] = (spatial_capacity[1] * spatial_capacity[2]).item()
-        arch_dict['arch']['storage'][0]['instances'] = (spatial_capacity[1] * spatial_capacity[2]).item()
-        arch_dict['arch']['storage'][1]['instances'] = (spatial_capacity[2]).item()
+        max_spatial = max(spatial_capacity[1], spatial_capacity[2])
+        # 方形
+        arch_dict['arch']['arithmetic']['instances'] = (max_spatial * max_spatial).item()
+        arch_dict['arch']['storage'][0]['instances'] = (max_spatial * max_spatial).item()
+        arch_dict['arch']['storage'][1]['instances'] = (max_spatial).item()
+        # arch_dict['arch']['arithmetic']['instances'] = (spatial_capacity[1] * spatial_capacity[2]).item()
+        # arch_dict['arch']['storage'][0]['instances'] = (spatial_capacity[1] * spatial_capacity[2]).item()
+        # arch_dict['arch']['storage'][1]['instances'] = (spatial_capacity[2]).item()
         arch_dict['arch']['storage'][2]['instances'] = 1
         arch_dict['arch']['storage'][3]['instances'] = 1
 

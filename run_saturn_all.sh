@@ -10,7 +10,7 @@ DNN_MODELS=(
     "bert"
     "vgg16"
     "resnet50"
-    # "resnet50_1"
+    # # "resnet50_1"
     "alexnet"
     "retinanet"
     "unet"
