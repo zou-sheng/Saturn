@@ -7,7 +7,7 @@ Level 0
     SPECS
     -----
     Word bits             : 8
-    Instances             : 17280 (17280*1)
+    Instances             : 16641 (16641*1)
     Compute energy        : 0.25 pJ
 
     STATS
@@ -29,7 +29,7 @@ Level 1
         Word bits                       : 8
         Block size                      : 1
         Cluster size                    : 1
-        Instances                       : 17280 (17280*1)
+        Instances                       : 16641 (16641*1)
         Shared bandwidth                : -
         Read bandwidth                  : -
         Write bandwidth                 : -
@@ -84,7 +84,7 @@ Level 2
         Word bits                       : 32
         Block size                      : 16
         Cluster size                    : 1
-        Instances                       : 128 (128*1)
+        Instances                       : 129 (129*1)
         Shared bandwidth                : -
         Read bandwidth                  : -
         Write bandwidth                 : -
@@ -106,8 +106,8 @@ Level 2
     Outputs:
         Partition size                           : 150544
         Utilized capacity                        : 388
-        Utilized instances (max)                 : 128
-        Utilized clusters (max)                  : 128
+        Utilized instances (max)                 : 2
+        Utilized clusters (max)                  : 2
         Scalar reads (per-instance)              : 0
         Scalar fills (per-instance)              : 0
         Scalar updates (per-instance)            : 150544
@@ -115,18 +115,18 @@ Level 2
         Address generations (per-cluster)        : 150544
         Energy (per-scalar-access)               : 2.18 pJ
         Energy (per-instance)                    : 327565.59 pJ
-        Energy (total)                           : 41928395.26 pJ
+        Energy (total)                           : 655131.18 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
         Address Generation Energy (total)        : 0.00 pJ
         Bandwidth Consumption Scale              : 1.00
         Shared Bandwidth (per-instance)          : 1.00 words/cycle
-        Shared Bandwidth (total)                 : 128.00 words/cycle
+        Shared Bandwidth (total)                 : 2.00 words/cycle
         Read Bandwidth (per-instance)            : 0.00 words/cycle
         Read Bandwidth (total)                   : 0.00 words/cycle
         Write Bandwidth (per-instance)           : 1.00 words/cycle
-        Write Bandwidth (total)                  : 128.00 words/cycle
+        Write Bandwidth (total)                  : 2.00 words/cycle
 
 Level 3
 -------
@@ -135,7 +135,7 @@ Level 3
     SPECS
     -----
         Technology                      : SRAM
-        Size                            : 745200
+        Size                            : 640872
         Word bits                       : 8
         Block size                      : 16
         Cluster size                    : 1
@@ -144,9 +144,9 @@ Level 3
         Read bandwidth                  : -
         Write bandwidth                 : -
         Multiple buffering              : 1.00
-        Effective size                  : 745200
+        Effective size                  : 640872
         Min utilization                 : 0.00
-        Vector access energy            : 300.36 pJ
+        Vector access energy            : 259.40 pJ
         Vector access energy source     : PAT
         Per-instance-cycle leakage      : 0.00 pJ
         Instances sharing power gating  : 1.00
@@ -168,9 +168,9 @@ Level 3
         Scalar updates (per-instance)            : 0
         Temporal reductions (per-instance)       : 0
         Address generations (per-cluster)        : 256
-        Energy (per-scalar-access)               : 18.77 pJ
-        Energy (per-instance)                    : 4805.69 pJ
-        Energy (total)                           : 4805.69 pJ
+        Energy (per-scalar-access)               : 16.21 pJ
+        Energy (per-instance)                    : 4150.41 pJ
+        Energy (total)                           : 4150.41 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
@@ -192,9 +192,9 @@ Level 3
         Scalar updates (per-instance)            : 0
         Temporal reductions (per-instance)       : 0
         Address generations (per-cluster)        : 19269632
-        Energy (per-scalar-access)               : 18.77 pJ
-        Energy (per-instance)                    : 361733780.42 pJ
-        Energy (total)                           : 361733780.42 pJ
+        Energy (per-scalar-access)               : 16.21 pJ
+        Energy (per-instance)                    : 312409816.60 pJ
+        Energy (total)                           : 312409816.60 pJ
         Temporal Reduction Energy (per-instance) : 0.00 pJ
         Temporal Reduction Energy (total)        : 0.00 pJ
         Address Generation Energy (per-cluster)  : 0.00 pJ
@@ -325,8 +325,8 @@ Operational Intensity Stats
     Total scalar accesses                   : 19269760
     Op per Byte                             : 1.98
 === Accumulator ===
-    Total scalar accesses                   : 19269632
-    Op per Byte                             : 0.50
+    Total scalar accesses                   : 301088
+    Op per Byte                             : 31.75
 === Scratchpad ===
     Total scalar accesses                   : 19269888
     Op per Byte                             : 1.98
@@ -338,18 +338,18 @@ Operational Intensity Stats
 Summary Stats
 -------------
 GFLOPs (@1GHz): 61.57
-Utilization: 0.18%
+Utilization: 0.19%
 Cycles: 621003
-Energy: 1411.48 uJ
-EDP(J*cycle): 8.77e+02
+Energy: 1320.89 uJ
+EDP(J*cycle): 8.20e+02
 Area: 0.00 mm^2
 
 Computes = 19269632
 fJ/Compute
     __ARITH__                   = 250.00
     Registers                   = 487.46
-    Accumulator                 = 2175.88
-    Scratchpad                  = 18772.47
+    Accumulator                 = 34.00
+    Scratchpad                  = 16212.76
     DRAM                        = 51563.33
-    Total                       = 73249.14
+    Total                       = 68547.56
 

@@ -1,6 +1,6 @@
 DRAM [ Weights:576 (576) Inputs:327184 (327184) Outputs:20793600 (20793600) ] 
 -----------------------------------------------------------------------------
-| for Q in [0:570)
+| for P in [0:570)
 
 Scratchpad [ Weights:576 (576) Inputs:1716 (1716) ] 
 ---------------------------------------------------
@@ -8,10 +8,10 @@ Scratchpad [ Weights:576 (576) Inputs:1716 (1716) ]
 
 Accumulator [ Outputs:570 (570) ] 
 ---------------------------------
-|     for P in [0:570)
-|       for S in [0:3) (Spatial-X)
-|         for R in [0:3) (Spatial-X)
+|     for S in [0:3) (Spatial-X)
+|       for R in [0:3) (Spatial-X)
 
 Registers [ Weights:1 (1) ] 
 ---------------------------
+|         for Q in [0:570)
 |           << Compute >>

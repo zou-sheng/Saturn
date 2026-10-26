@@ -1242,19 +1242,67 @@ class MappingExplorer:
 
         prob += objective
         
-        # 除DRAM外每一个存储层次的存储容量约束
+        # # 除DRAM外每一个存储层次的存储容量约束
+        # for k in range(len(dimension_list)):
+        #     # 去掉DRAM
+        #     for r in range(len(p.buffer_hierarchy)-1):
+        #         buf_capacity = 0
+        #         tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[r]]
+        #         for i in range(r+1):
+        #             for tensor in tensors_list:
+        #                 for dim in self.tensor_dimensions[tensor]:
+        #                     buf_capacity += temporal_tiles[k][i][dim]
+        #                     buf_capacity += spatial_tiles[k][i][dim]
+                
+        #         prob += buf_capacity <= len(tensors_list)*(buffer_capacity[r] - math.log2(len(tensors_list)))
+
+        # 除DRAM外每一个存储层次的存储容量约束  big-M
         for k in range(len(dimension_list)):
             # 去掉DRAM
             for r in range(len(p.buffer_hierarchy)-1):
-                buf_capacity = 0
                 tensors_list = p.tensor_in_buffer[p.buffer_hierarchy[r]]
-                for i in range(r+1):
-                    for tensor in tensors_list:
-                        for dim in self.tensor_dimensions[tensor]:
-                            buf_capacity += temporal_tiles[k][i][dim]
-                            buf_capacity += spatial_tiles[k][i][dim]
+                K = len(tensors_list)
                 
-                prob += buf_capacity <= len(tensors_list)*(buffer_capacity[r] - math.log2(len(tensors_list)))
+                if K == 0:
+                    continue
+                
+                if K == 1:
+                    # 单数据类型：直接线性约束（对应论文公式3）
+                    tensor = tensors_list[0]
+                    L_k = 0
+                    for i in range(r+1):
+                        for dim in self.tensor_dimensions[tensor]:
+                            L_k += temporal_tiles[k][i][dim]
+                            L_k += spatial_tiles[k][i][dim]
+                    prob += L_k <= buffer_capacity[r]
+                else:
+                    # 多数据类型：使用 Big-M 线性化（对应论文公式4和5）
+                    L_ks = []
+                    for tensor in tensors_list:
+                        L_k = 0
+                        for i in range(r+1):
+                            for dim in self.tensor_dimensions[tensor]:
+                                L_k += temporal_tiles[k][i][dim]
+                                L_k += spatial_tiles[k][i][dim]
+                        L_ks.append(L_k)
+                        
+                    # 引入辅助连续变量 L_sum 和二值选择变量 z
+                    L_sum = LpVariable(f"L_sum_{k}_{r}", lowBound=0)
+                    z = [LpVariable(f"z_{k}_{r}_{i}", cat='Binary') for i in range(K)]
+                    
+                    prob += sum(z) == 1
+                    
+                    # 大 M 常数，log2 域容量上限一般不超过 30，取 100 足够大
+                    M = 100.0
+                    
+                    for i in range(K):
+                        # L_sum >= L_k
+                        prob += L_sum >= L_ks[i]
+                        # L_sum <= L_k + M(1 - z_k) + log2(K)
+                        prob += L_sum <= L_ks[i] + M * (1 - z[i]) + math.log2(K)
+                        
+                    # L_sum <= 该层次的可用对数容量
+                    prob += L_sum <= buffer_capacity[r]
 
             
         # 并行容量约束
