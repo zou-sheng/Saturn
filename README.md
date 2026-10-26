@@ -18,5 +18,5 @@ pip install -r requirements.txt
 ### Run Example ###
 
 ```
-run_saturn.sh
+run_saturn_all.sh
 ```
